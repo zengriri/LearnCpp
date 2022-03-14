@@ -1,0 +1,2 @@
+# LearnCpp
+cpp note
