@@ -1,0 +1,55 @@
+局部变量：
+    局部变量具有块范围，这意味着它们从定义点到定义它们的块的末尾都在范围内。
+
+    局部变量具有自动存储持续时间，这意味着它们在定义点创建并在定义它们的块的末尾销毁。
+
+
+全局变量：
+    全局变量在程序启动时创建，在程序结束时销毁。这称为静态持续时间。具有静态持续时间的变量有时称为静态变量
+
+    因为其定义是在函数之外定义的，所以全局变量被认为是全局命名空间的一部分（因此称为“全局命名空间范围”）
+
+
+    全局变量初始化：
+            非常量全局变量可以选择性地初始化：
+
+                eg:
+                    int g_x; // no explicit initializer (zero-initialized by default)
+                    int g_y {}; // zero initialized
+                    int g_z { 1 }; // initialized with value
+
+
+            常量全局变量:
+                全局变量也可以是常量。与所有常量一样，必须初始化常量全局变量。
+
+                eg：    
+                    const int g_x; // error: constant variables must be initialized
+                    constexpr int g_w; // error: constexpr variables must be initialized
+                    const int g_y { 1 };  // const global variable g_y, initialized with a value
+                    constexpr int g_z { 2 }; // constexpr global variable g_z, initialized with a value
+
+
+全局变量的链接:
+
+    内部链接的全局变量:
+        *以在单个文件中看到和使用具有内部链接的标识符，但不能从其他文件访问它（即，它不暴露给链接器)这意味着如果两个文件具有具有内部链接的同名标识符，则这些标识符将被视为独立的。
+
+        *为了使非常量全局变量成为内部变量，我们使用 static 关键字。
+
+        *const 和 constexpr 全局变量默认具有内部链接（因此不需要 static 关键字 - 如果使用它，它将被忽略）。
+            eg：   
+                constexpr int g_x { 2 }; // this internal g_x is only accessible within a.cpp
+
+
+
+        
+
+
+    
+
+
+
+
+        
+
+

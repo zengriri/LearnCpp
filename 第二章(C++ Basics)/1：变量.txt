@@ -1,0 +1,52 @@
+Objects and variables：
+    所有计算机都有内存，称为 RAM（随机存取内存的缩写），可供您的程序使用。您可以将 RAM 视为一系列编号的邮箱，每个邮箱可用于在程序运行时保存一段数据。存储在内存中某处的单个数据称为值。
+    在 C++ 中，不允许直接访问内存。相反，我们通过对象间接访问内存。对象是一个存储区域（通常是内存），它具有一个值和其他相关属性。
+    对象可以命名或未命名（匿名）。命名对象称为变量，对象的名称称为标识符。在我们的程序中，我们创建和使用的大多数对象都是变量。
+
+Data types：
+    数据类型（通常称为类型）告诉编译器变量将存储什么类型的值（例如数字、字母、文本等）
+
+Initialization： 
+    定义变量时，您可以为变量提供初始值。这称为初始化。用于初始化变量的值称为初始化器
+    eg:
+        int a; // no initializer
+        int b = 5; // initializer after equals sign
+        int c( 6 ); // initializer in parenthesis
+        int d { 7 }; // initializer in braces
+
+    共有4种初始化方法：
+        Default initialization：
+            没有提供初始值。在大多数情况下，默认初始化会留下一个具有不确定值的变量 eg:int a;
+        
+        Copy initialization:
+            当等号后提供初始化器时，这称为复制初始化。复制初始化继承自 C 语言     eg：int width = 5; // copy initialization of value 5 into variable width
+
+        Direct Initialization：
+            当括号内提供初始化器时，这称为直接初始化。                          eg: int width( 5 ); // direct initialization of value 5 into variable width
+            
+            注：对于简单的数据类型（如 int），复制和直接初始化本质上是一样的。对于更复杂的类型，直接初始化往往比复制初始化更有效
+
+        Brace Initialization：
+            不幸的是，直接初始化不能用于所有类型的初始化（eg: initializing an object with a list of data）.
+            为了提供更一致的初始化机制，有使用花括号的大括号初始化（也称为统一初始化或列表初始化）。    eg: int width{ 5 }
+            直接和复制大括号初始化函数几乎相同，但通常首选直接形式
+
+            注：大括号初始化具有不允许“缩小”转换的额外好处。这意味着，如果您尝试使用大括号初始化来使用无法安全保存的值来初始化变量，编译器将抛出警告或错误。
+                eg: int width { 4.5 }; // error: not all double values fit into an int
+
+    ***建议：
+        尽可能使用大括号进行初始化   
+
+Value initialization and zero Initialization：
+    当一个变量用空括号初始化时，就会发生值初始化。在大多数情况下，值初始化会将变量初始化为零（或空，如果这更适合给定类型）。在发生归零的这种情况下，这称为归零初始化。
+        eg：int width {}; // zero initialization to value 0
+
+
+    
+
+            
+
+
+
+
+
