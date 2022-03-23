@@ -1,0 +1,259 @@
+声明和定义
+    *声明是一个标识符，而定义就像是实例化一个对象，eg ing a=5; a是一个标识符，他表示一个int类型，值为5的对象。
+
+    *声明满足于编译器，而不满足于连接器。而定义两者皆可。因此：在 C++ 中，所有定义也用作声明。这就是为什么 int x 出现在我们的定义和声明示例中的原因
+
+
+        #include <iostream>
+        int add(int x, int y); // forward declaration of add() using function prototype
+        int main()
+        {
+            std::cout << "The sum of 3 and 4 is: " << add(3, 4) << '\n';
+            return 0;
+        }
+        // note: No definition for function add
+
+        分析:1：函数已声明，但却未定义，为什么编译通过?
+            answer:虽然前向声明，但从未调用过该函数，则程序将编译并运行良好。  
+                    但是，如果进行了前向声明并调用了函数，但程序从未定义函数，则程序可以编译，但链接器会抱怨它无法解析函数调用
+
+    *前向声明：
+        函数使用前，请进行先声明
+
+
+    内联函数:
+        有资格扩展其函数调用的函数称为内联函数
+
+
+        *C++ 编译器有一个技巧可以用来避免这种开销成本：内联扩展是一个函数调用被调用函数定义中的代码替换的过程。
+        *内联扩展可以让编译器更有效地优化生成的代码
+
+        缺点:
+            如果被扩展的函数的主体比被替换的函数调用需要更多的指令，，那么每次内联扩展都会导致可执行文件变大。较大的可执行文件往往速度较慢（由于不适合缓存）。
+
+
+        *所以，内联扩展可能会导致性能提高、性能降低或根本不改变性能，这取决于函数调用的相对成本、函数的大小以及可以执行的其他优化
+
+
+        *现代优化编译器通常非常擅长确定哪些函数应该内联——在大多数情况下比人类更好。结果，编译器可能会忽略或贬低您对内联函数所做的任何请求。
+
+        最佳实践：
+            不要使用 inline 关键字来请求函数的内联扩展。
+
+
+
+    匿名函数:
+        lambda 表达式（也称为 lambda 或闭包）允许我们在另一个函数中定义一个匿名函数。嵌套很重要，因为它让我们既可以避免命名空间命名污染，又可以将函数定义为尽可能靠近使用它的位置（提供额外的上下文）
+             *lambda 的这种用法有时被称为函数字面量。
+
+        语法格式
+            [ captureClause ] ( parameters ) -> returnType
+            {
+                statements;
+            }
+
+            注:
+               *如果不需要，捕获子句和参数都可以为空。
+               *返回类型是可选的，如果省略，将假定为 auto（因此使用类型推断来确定返回类型）。
+
+
+        类型：
+            eg:
+                auto isEven{
+                    [](int i)
+                    {
+                        return ((i % 2) == 0);
+                    }
+                };
+                return std::all_of(array.begin(), array.end(), isEven);
+
+            lambda isEven 的类型是什么？
+                *事实证明，lambda 没有我们可以显式使用的类型。当我们编写一个 lambda 时，编译器会为未暴露给我们的 lambda 生成一个唯一类型
+
+                *实际上，lambda 不是函数（这是它们如何避免 C++ 不支持嵌套函数的限制的一部分）
+                *它们是一种特殊的对象，称为函子。函子是包含重载 operator() 的对象，使它们像函数一样可调用。
+
+        
+        Lambda 捕获:
+            *lambda 只能访问特定类型的标识符：全局标识符、编译时已知的实体以及具有静态存储持续时间的实体。capture 子句用于（间接）让 lambda 访问它通常无法访问的周围范围内可用的变量
+
+            *当执行 lambda 定义时，对于 lambda 捕获的每个变量，都会在 lambda 中创建该变量的克隆（具有相同的名称）。这些克隆的变量此时从同名的外部范围变量初始化。
+                注：
+                    捕获的 lambda 变量是外部范围变量的克隆，而不是实际变量。
+                    *当编译器遇到 lambda 定义时，它会为 lambda 创建一个自定义对象定义。每个捕获的变量都成为对象的数据成员。
+                    *在运行时，当遇到 lambda 定义时，将实例化 lambda 对象，并在该点初始化 lambda 的成员
+
+
+            *捕获默认为 const 值
+                这意味着当创建 lambda 时，lambda 会捕获外部范围变量的常量副本，这意味着不允许 lambda 修改它们
+
+
+            Mutable capture by value：
+                为了允许修改通过值捕获的变量，我们可以将 lambda 标记为可变。在此上下文中的 mutable 关键字删除了 const
+                 eg:
+                        #include <iostream>
+
+                        int main()
+                        {
+                        int ammo{ 10 };
+
+                        auto shoot{
+                            // Added mutable after the parameter list.
+                            [ammo]() mutable {
+                            // We're allowed to modify ammo now
+                            --ammo;
+
+                            std::cout << "Pew! " << ammo << " shot(s) left.\n";
+                            }
+                        };
+
+                        shoot();
+                        shoot();
+
+                        std::cout << ammo << " shot(s) left\n";
+
+                        return 0;
+                        }
+
+                        output:
+                            Pew! 9 shot(s) left.
+                            Pew! 8 shot(s) left.
+                            10 shot(s) left
+
+                    *请注意，ammo 的值会在对 lambda 的调用中保留！
+
+
+        Capture by reference
+            *要通过引用捕获变量，我们在捕获中的变量名称前添加一个和号 (&)
+            *与按值捕获的变量不同，按引用捕获的变量是非常量的，除非它们捕获的变量是 const
+            *每当您通常希望通过引用将参数传递给函数时，按引用捕获应该优先于按值捕获
+
+            eg：    
+                #include <iostream>
+                int main()
+                {
+                int ammo{ 10 };
+
+                auto shoot{
+                    // We don't need mutable anymore
+                    [&ammo]() { // &ammo means ammo is captured by reference
+                    // Changes to ammo will affect main's ammo
+                    --ammo;
+
+                    std::cout << "Pew! " << ammo << " shot(s) left.\n";
+                    }
+                };
+
+                shoot();
+
+                std::cout << ammo << " shot(s) left\n";
+
+                return 0;
+                }
+
+        Default captures：
+            默认捕获（也称为默认捕获）捕获 lambda 中提到的所有变量。如果使用默认捕获，则不会捕获 lambda 中未提及的变量
+
+                *要按值捕获所有使用的变量，请使用捕获值 =。
+                *要通过引用捕获所有使用的变量，请使用 & 的捕获值。
+
+                    eg:
+                        int health{ 33 };
+                        int armor{ 100 };
+                        std::vector<CEnemy> enemies{};
+
+                        // Capture health and armor by value, and enemies by reference.
+                        [health, armor, &enemies](){};
+
+                        // Capture enemies by reference and everything else by value.
+                        [=, &enemies](){};
+
+                        // Capture armor by value and everything else by reference.
+                        [&, armor](){};
+
+                        // Illegal, we already said we want to capture everything by reference.
+                        [&, &armor](){};
+
+                        // Illegal, we already said we want to capture everything by value.
+                        [=, armor](){};
+
+                        // Illegal, armor appears twice.
+                        [armor, &health, &armor](){};
+
+                        // Illegal, the default capture has to be the first element in the capture group.
+                        [armor, &](){};
+
+        注：
+            通过引用捕获变量时要格外小心，尤其是使用默认引用捕获。捕获的变量必须比 lambda 寿命更长
+    
+        可变 lambda 的意外副本:
+
+            eg：
+                #include <iostream>
+                int main()
+                {
+                int i{ 0 };
+
+                // Create a new lambda named count
+                auto count{ [i]() mutable {
+                    std::cout << ++i << '\n';
+                } };
+
+                count(); // invoke count
+
+                auto otherCount{ count }; // create a copy of count
+
+                // invoke both count and the copy
+                count();
+                otherCount();
+
+                return 0;
+                }
+
+                    Output
+                    1
+                    2
+                    2
+
+                代码不是打印 1、2、3，而是两次打印 2
+                .当我们创建 otherCount 作为 count 的副本时，我们创建了当前状态的 count 副本。 count 的 i 是 1，所以 otherCount 的 i 也是 1。由于 otherCount 是 count 的副本，因此它们每个都有自己的 i
+
+            *幸运的是，C++ 提供了一种方便的类型（作为 <functional> 标头的一部分），称为 std::reference_wrapper，它允许我们像传递引用一样传递普通类型。
+                eg:
+                    #include <iostream>
+                    #include <functional>
+
+                    void invoke(const std::function<void()>& fn)
+                    {
+                        fn();
+                    }
+
+                    int main()
+                    {
+                        int i{ 0 };
+
+                        // Increments and prints its local copy of @i.
+                        auto count{ [i]() mutable {
+                        std::cout << ++i << '\n';
+                        } };
+
+                        // std::ref(count) ensures count is treated like a reference
+                        // thus, anything that tries to copy count will actually copy the reference
+                        // ensuring that only one count exists
+                        invoke(std::ref(count));
+                        invoke(std::ref(count));
+                        invoke(std::ref(count));
+
+                        return 0;
+                    }
+
+            
+            
+
+
+        
+
+       
+
+
+        

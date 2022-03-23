@@ -1,0 +1,62 @@
+eg:
+        #include <iostream>
+        #include <cstdarg> // needed to use ellipsis
+
+        // The ellipsis must be the last parameter
+        // count is how many additional arguments we're passing
+        double findAverage(int count, ...)
+        {
+            int sum{ 0 };
+
+            // We access the ellipsis through a va_list, so let's declare one
+            std::va_list list;
+
+            // We initialize the va_list using va_start.  The first parameter is
+            // the list to initialize.  The second parameter is the last non-ellipsis
+            // parameter.
+            va_start(list, count);
+
+            // Loop through all the ellipsis arguments
+            for (int arg{ 0 }; arg < count; ++arg)
+            {
+                // We use va_arg to get parameters out of our ellipsis
+                // The first parameter is the va_list we're using
+                // The second parameter is the type of the parameter
+                sum += va_arg(list, int);
+            }
+
+            // Cleanup the va_list when we're done.
+            va_end(list);
+
+            return static_cast<double>(sum) / count;
+        }
+
+        int main()
+        {
+            std::cout << findAverage(5, 1, 2, 3, 4, 5) << '\n';
+            std::cout << findAverage(6, 1, 2, 3, 4, 5, 6) << '\n';
+        }
+
+
+
+分析：
+    *首先，我们必须包含 cstdarg 标头。此标头定义了 va_list、va_arg、va_start 和 va_end，它们是我们需要用来访问作为省略号一部分的参数的宏
+
+    *然后我们声明使用省略号的函数。请记住，参数列表必须是一个或多个固定参数。在这种情况下，我们传入一个整数，告诉我们要平均多少个数字。省略号总是最后出现。
+
+    *请注意，省略号参数没有名称！相反，我们通过称为 va_list 的特殊类型访问省略号中的值。
+        将 va_list 视为指向省略号数组的指针在概念上很有用。首先，我们声明一个 va_list，为简单起见，我们将其称为“列表”。
+    
+    *接下来我们需要做的是让列表指向我们的省略号参数
+        我们通过调用 va_start() 来做到这一点。 va_start() 有两个参数：va_list 本身，以及函数中最后一个非省略号参数的名称。调用 va_start() 后，va_list 将指向省略号中的第一个参数。
+
+    *要获取 va_list 当前指向的参数的值，我们使用 va_arg()。 va_arg() 也接受两个参数：va_list 本身，以及我们试图访问的参数的类型。
+        请注意，va_arg() 还将 va_list 移动到省略号中的下一个参数！
+
+    *最后，为了在完成后进行清理，我们调用 va_end()，以 va_list 作为参数。
+        请注意，只要我们想重新设置 va_list 以再次指省略中的第一个参数，就可以再次调用 va_start()。
+
+
+缺点:
+    *省略号丢掉了参数的类型，逃避了编译器的类型检测。增加程序员自己把控风险
+    *省略号不仅丢掉了参数的类型，还丢掉了省略号中的参数个数。这意味着我们必须设计自己的解决方案来跟踪传递给省略号的参数数量

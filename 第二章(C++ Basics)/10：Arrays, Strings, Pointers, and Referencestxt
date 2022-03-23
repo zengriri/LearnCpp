@@ -1,0 +1,43 @@
+void pointer：
+    void 指针，也称为泛型指针，是一种特殊类型的指针，可以指向任何数据类型的对象
+        eg:
+            void* ptr; // ptr is a void pointer
+
+
+Function Pointers:
+    指向函数的指针
+    eg：
+        int (*fcnPtr)();     // fcnPtr is a pointer to a function that takes no arguments and returns an integer
+        int (*const fcnPtr)();
+
+    注:
+        默认参数不适用于通过函数指针调用的函数(一个是编译时，一个是运行时)
+
+    使用类型别名使函数指针更漂亮：
+        eg:
+            using ValidateFunction = bool(*)(int, int);
+
+    Using std::function:
+
+        定义和存储函数指针的另一种方法是使用 std::function，它是标准库 <functional> 头文件的一部分
+        eg：
+            bool validate(int x, int y, std::function<bool(int, int)> fcn); // std::function method that returns a bool and takes two int parameters
+
+            std::function<int()> fcnPtr{ &foo }
+
+            using ValidateFunctionRaw = bool(*)(int, int); // type alias to raw function pointer
+            using ValidateFunction = std::function<bool(int, int)>; // type alias to std::function
+
+        
+        Type inference for function pointer：
+            eg:
+                auto fcnPtr{ &foo };
+
+        建议:
+            *因为声明函数指针的原生语法丑陋且容易出错，我们建议使用 std::function。
+            *在函数指针类型只使用一次的地方（例如单个参数或返回值），可以直接使用 std::function
+            *在多次使用函数指针类型的地方， std::function 的类型别名是更好的选择（以防止重复自己）
+
+
+
+
