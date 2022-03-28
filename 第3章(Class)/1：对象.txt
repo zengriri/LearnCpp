@@ -1,0 +1,59 @@
+class Base
+{
+public:
+    virtual void function1() {};
+    virtual void function2() {};
+};
+
+class D1: public Base
+{
+public:
+    virtual void function1() {};
+};
+
+class D2: public Base
+{
+public:
+    virtual void function2() {};
+};
+
+/*
+    因为这里有 3 个类，所以编译器会设置 3 个虚拟表：一个用于 Base，一个用于 D1，一个用于 D2。
+
+    编译器还将隐藏指针成员添加到使用虚函数的大多数基类中。尽管编译器会自动执行此操作，但我们会将其放在下一个示例中，以显示它的添加位置：
+            class Base
+            {
+            public:
+                VirtualTable* __vptr;
+                virtual void function1() {};
+                virtual void function2() {};
+            };
+
+            class D1: public Base
+            {
+            public:
+                virtual void function1() {};
+            };
+
+            class D2: public Base
+            {
+            public:
+                virtual void function2() {};
+            };
+
+        创建类实例时， *__vptr 设置为指向该类的虚拟表
+            例如，当创建 Base 类型的对象时，*__vptr 被设置为指向 Base 的虚拟表。当构造 D1 或 D2 类型的对象时，*__vptr 被设置为分别指向 D1 或 D2 的虚拟表
+
+            现在，我们来谈谈这些虚拟表是如何填写的:
+                因为这里只有两个虚函数，所以每个虚表将有两个条目（一个用于 function1()，一个用于 function2()）。
+                请记住，在填充这些虚表时，每个条目都是用该类类型的对象可以调用的派生最多的函数填充的。
+
+                Base 对象的虚拟表很简单。 Base 类型的对象只能访问 Base 的成员。Base 无法访问 D1 或 D2 功能。因此，function1 的入口指向 Base::function1()，而 function2 的入口指向 Base::function2()。
+
+                D1 的虚拟表稍微复杂一些。1 类型的对象可以访问 D1 和 Base 的成员
+                    然而，D1 已经覆盖了 function1()，使得 D1::function1() 比 Base::function1() 更加派生。因此，function1 的条目指向 D1::function1()。
+                    D1 没有覆盖 function2()，所以 function2 的入口将指向 Base::function2()。
+
+                D2 的虚表与 D1 类似，只是 function1 的入口指向 Base::function1()，而 function2 的入口指向 D2::function2()
+
+*/

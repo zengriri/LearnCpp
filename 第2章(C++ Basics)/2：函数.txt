@@ -55,23 +55,50 @@
             注:
                *如果不需要，捕获子句和参数都可以为空。
                *返回类型是可选的，如果省略，将假定为 auto（因此使用类型推断来确定返回类型）。
+                    eg：2-1
 
 
         类型：
+            *就像我们可以用字面值（或函数指针）初始化一个变量以供以后使用一样，我们也可以用 lambda 定义初始化一个 lambda 变量，然后再使用它
+                一个命名的 lambda 和一个好的函数名可以使代码更容易阅读。
             eg:
-                auto isEven{
-                    [](int i)
-                    {
-                        return ((i % 2) == 0);
-                    }
-                };
-                return std::all_of(array.begin(), array.end(), isEven);
+                return std::all_of(array.begin(), array.end(), [](int i){ return ((i % 2) == 0); });
+                替换为：
+                        auto isEven{
+                        [](int i)
+                        {
+                            return ((i % 2) == 0);
+                        }
+                        };
+
+                        return std::all_of(array.begin(), array.end(), isEven);
 
             lambda isEven 的类型是什么？
                 *事实证明，lambda 没有我们可以显式使用的类型。当我们编写一个 lambda 时，编译器会为未暴露给我们的 lambda 生成一个唯一类型
 
                 *实际上，lambda 不是函数（这是它们如何避免 C++ 不支持嵌套函数的限制的一部分）
+
                 *它们是一种特殊的对象，称为函子。函子是包含重载 operator() 的对象，使它们像函数一样可调用。
+
+
+                *虽然我们不知道 lambda 的类型，但有几种存储 lambda 以供后定义使用的方法：
+                    1：指针
+                    2：function
+                    2:auto
+
+                *使用 lambda 的实际类型的唯一方法是通过 auto。与 std::function 相比， auto 还具有没有开销的好处
+                *使用 lambda 初始化变量时使用 auto，如果无法使用 lambda 初始化变量，则使用 std::function。
+
+                    eg:2-2
+
+        Generic lambdas:
+            *在大多数情况下，lambda 参数的工作规则与常规函数参数相同
+            *当 lambda 具有一个或多个 auto 参数时，编译器将从对 lambda 的调用中推断出需要哪些参数类型。
+                eg2-3
+
+        Generic lambdas and static variables：
+            需要注意的一件事是，将为自动解析到的每种不同类型生成一个唯一的 lambda
+                eg:2-4
 
         
         Lambda 捕获:
@@ -83,44 +110,18 @@
                     *当编译器遇到 lambda 定义时，它会为 lambda 创建一个自定义对象定义。每个捕获的变量都成为对象的数据成员。
                     *在运行时，当遇到 lambda 定义时，将实例化 lambda 对象，并在该点初始化 lambda 的成员
 
+                eg：2-5
+
 
             *捕获默认为 const 值
                 这意味着当创建 lambda 时，lambda 会捕获外部范围变量的常量副本，这意味着不允许 lambda 修改它们
 
-
             Mutable capture by value：
-                为了允许修改通过值捕获的变量，我们可以将 lambda 标记为可变。在此上下文中的 mutable 关键字删除了 const
-                 eg:
-                        #include <iostream>
+                *为了允许修改通过值捕获的变量，我们可以将 lambda 标记为可变。在此上下文中的 mutable 关键字删除了 const
 
-                        int main()
-                        {
-                        int ammo{ 10 };
+                *请注意，ammo 的值会在对 lambda 的调用中保留！
 
-                        auto shoot{
-                            // Added mutable after the parameter list.
-                            [ammo]() mutable {
-                            // We're allowed to modify ammo now
-                            --ammo;
-
-                            std::cout << "Pew! " << ammo << " shot(s) left.\n";
-                            }
-                        };
-
-                        shoot();
-                        shoot();
-
-                        std::cout << ammo << " shot(s) left\n";
-
-                        return 0;
-                        }
-
-                        output:
-                            Pew! 9 shot(s) left.
-                            Pew! 8 shot(s) left.
-                            10 shot(s) left
-
-                    *请注意，ammo 的值会在对 lambda 的调用中保留！
+                eg:2-6
 
 
         Capture by reference
@@ -128,28 +129,8 @@
             *与按值捕获的变量不同，按引用捕获的变量是非常量的，除非它们捕获的变量是 const
             *每当您通常希望通过引用将参数传递给函数时，按引用捕获应该优先于按值捕获
 
-            eg：    
-                #include <iostream>
-                int main()
-                {
-                int ammo{ 10 };
-
-                auto shoot{
-                    // We don't need mutable anymore
-                    [&ammo]() { // &ammo means ammo is captured by reference
-                    // Changes to ammo will affect main's ammo
-                    --ammo;
-
-                    std::cout << "Pew! " << ammo << " shot(s) left.\n";
-                    }
-                };
-
-                shoot();
-
-                std::cout << ammo << " shot(s) left\n";
-
-                return 0;
-                }
+            eg：2-7
+        
 
         Default captures：
             默认捕获（也称为默认捕获）捕获 lambda 中提到的所有变量。如果使用默认捕获，则不会捕获 lambda 中未提及的变量
@@ -247,8 +228,14 @@
                         return 0;
                     }
 
-            
-            
+
+        Defining new variables in the lambda-capture:  
+            有时我们想要捕获一个稍作修改的变量，或者声明一个仅在 lambda 范围内可见的新变量。我们可以通过在 lambda-capture 中定义一个变量而不指定它的类型来做到这一点
+                eg:2-8
+
+        Unintended copies of mutable lambdas:
+            因为 lambdas 是对象，所以它们可以被复制。在某些情况下，这可能会导致问题
+                eg：2-9，2-10，2-11
 
 
         

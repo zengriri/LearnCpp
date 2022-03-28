@@ -1,0 +1,13 @@
+使用 std::initializer_list 进行类初始化：
+
+    *当编译器看到初始化列表时，它会自动将其转换为 std::initializer_list 类型的对象。因此，如果我们创建一个带有 std::initializer_list 参数的构造函数，我们可以使用初始化列表作为输入来创建对象。
+
+    *std::initializer_list 位于 <initializer_list> 标头中。
+        与 std::array 或 std::vector 非常相似，您必须使用尖括号告诉 std::initializer_list 列表包含什么类型的数据，除非您立即初始化 std::initializer_list
+        因此，您几乎永远不会看到一个普通的 std::initializer_list。相反，您会看到类似 std::initializer_list<int> 或 std::initializer_list<std::string> 的内容
+
+    *std::initializer_list 有一个（错误命名的）size() 函数，它返回列表中元素的数量。当我们需要知道传入列表的长度时，这很有用。
+        eg:6-1
+    
+
+
