@@ -6,6 +6,15 @@ Objects and variables：
 Data types：
     数据类型（通常称为类型）告诉编译器变量将存储什么类型的值（例如数字、字母、文本等）
 
+左值和右值引用：
+    C++11 添加了一种新的引用类型，称为 r 值引用。 r 值引用是设计为使用 r 值（仅）初始化的引用。
+        左值引用是使用单个 & 符号创建的，而右值引用是使用双 & 符号创建的：
+            eg:
+                int x{ 5 };
+                int &lref{ x }; // l-value reference initialized with l-value x
+                int &&rref{ 5 }; // r-value reference initialized with r-value 5 
+
+
 Initialization： 
     定义变量时，您可以为变量提供初始值。这称为初始化。用于初始化变量的值称为初始化器
     eg:

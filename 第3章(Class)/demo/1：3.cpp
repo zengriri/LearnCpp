@@ -5,9 +5,12 @@ class MyString
 {
 private:
 	std::string m_string;
+
 public:
+	MyString(char) = delete; // any use of this constructor is an error
+
 	// explicit keyword makes this constructor ineligible for implicit conversions
-	explicit MyString(int x) // allocate string of size x
+	explicit MyString(int x) // allocate string of size x /
 	{
 		m_string.resize(x);
 	}
@@ -27,17 +30,9 @@ std::ostream& operator<<(std::ostream& out, const MyString& s)
 	return out;
 }
 
-void printString(const MyString& s)
-{
-	std::cout << s;
-}
-
 int main()
 {
-	MyString mine = 'x'; // compile error, since MyString(int) is now explicit and nothing will match this
+	MyString mine('x'); // compile error, since MyString(char) is deleted
 	std::cout << mine;
-
-	printString('x'); // compile error, since MyString(int) can't be used for implicit conversions
-
 	return 0;
 }

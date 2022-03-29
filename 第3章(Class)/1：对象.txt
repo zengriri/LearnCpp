@@ -9,6 +9,15 @@ Destructors:
 The hidden “this” pointer:
 
 
+explicit:
+    关键字explicit明确构造函数（和转换函数）不能进行隐式转换，该关键字位于函数名称的前面。
+        eg:1-2
+
+delete:
+    使用“delete”关键字删除函数.当一个函数被删除时，对该函数的任何使用都被认为是编译错误。
+    请注意，也可以删除复制构造函数和重载运算符，以防止使用这些函数
+    eg:1-3
+
 
 Class code and header files:
     传统上，类定义放在与类同名的头文件中，在类外定义的成员函数放在与类同名的.cpp文件中。

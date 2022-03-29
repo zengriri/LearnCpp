@@ -42,6 +42,63 @@ catch：
     catch(...):
         C++ 为我们提供了一种机制来捕获所有类型的异常
 
+eg：1-1
+
+
+noexcept:
+    在 C++ 中，所有函数都被分类为非抛出（不抛出异常）或潜在抛出（可能抛出异常）。
+        noexcept 说明符将函数定义为非抛出。要将函数定义为非抛出，我们可以在函数声明中使用 noexcept 说明符，放置在函数参数列表的右侧
+
+    请注意， noexcept 实际上并不能阻止函数抛出异常或调用可能会抛出的其他函数.
+        相反，当抛出异常时，如果异常退出noexcept函数，则会调用std::terminate。
+        注意，如果从noexcept函数内部调用std::terminate函数，堆栈展开可能发生也可能不会发生(取决于实现和优化)，这意味着你的对象可能在终止之前被正确地销毁，也可能不会
+        
+    noexcept 说明符有一个可选的布尔参数。 noexcept(true) 等价于 noexcept，表示该函数是非抛出的。noexcept(false) 表示该函数可能会抛出
+        这些参数通常只在模板函数中使用，因此模板函数可以根据某些参数化值动态创建为非抛出或潜在抛出。
+
+    哪些函数是非抛出函数和潜在抛出函数:
+        默认不抛出的函数：
+            *Destructors
+
+        对于隐式声明或默认函数默认不抛出的函数：
+            *Constructors: default, copy, move
+            *Assignments: copy, move
+            *Comparison operators (as of C++20)
+
+        可能抛出的函数（如果没有隐式声明或默认）：
+            *Normal functions
+            *User-defined constructors
+            *User-defined operators
+
+
+    noexcept 运算符：
+        noexcept 运算符可以在函数内部使用。它将表达式作为参数，如果编译器认为它会抛出异常，则返回 true 或 false。
+            noexcept 运算符在编译时进行静态检查，实际上并不计算输入表达式。
+
+            eg:
+                void foo() {throw -1;}
+                void boo() {};
+                void goo() noexcept {};
+                struct S{};
+
+                constexpr bool b1{ noexcept(5 + 3) }; // true; ints are non-throwing
+                constexpr bool b2{ noexcept(foo()) }; // false; foo() throws an exception
+                constexpr bool b3{ noexcept(boo()) }; // false; boo() is implicitly noexcept(false)
+                constexpr bool b4{ noexcept(goo()) }; // true; goo() is explicitly noexcept(true)
+                constexpr bool b5{ noexcept(S{}) };   // true; a struct's default constructor is noexcept by default
+
+        noexcept 运算符可用于有条件地执行代码，具体取决于代码是否可能抛出
+
+
+    异常安全保证:
+        异常安全保证是关于函数或类在异常发生时如何表现的合同指南。异常安全有四个级别:
+            *没有保证--无法保证如果抛出异常会发生什么（例如，一个类可能处于不可用状态）
+            *基本保证--如果抛出异常，则不会泄漏内存，对象仍然可用，但程序可能会处于修改状态。
+            *强有力的保证--如果抛出异常，不会有内存泄漏，程序状态也不会改变。这意味着该函数必须完全成功，或者如果失败则没有副作用
+                如果在首先修改任何内容之前发生故障，这很容易，但也可以通过回滚任何更改来实现，以便程序返回到故障前状态
+
+            *不抛出/不失败--该函数将始终成功（no-fail）或失败而不抛出异常（no-throw）。
+
 
 重述异常处理:
     *当引发异常时（使用 throw），程序的执行会立即跳转到最近的封闭 try 块（如果需要，向上传播堆栈以找到封闭的 try 块）。
@@ -53,4 +110,5 @@ catch：
     note:
         请注意，在将异常与 catch 块匹配时，编译器不会执行隐式转换或提升！例如，char 异常不会与 int catch 块匹配。 int 异常将不匹配 float catch 块。但是，将执行从派生类到其父类之一的强制转换。
 
-eg：1-1
+
+
