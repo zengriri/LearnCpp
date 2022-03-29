@@ -1,0 +1,27 @@
+简介：
+    *模板类型参数不是唯一可用的模板参数类型。模板类和函数可以使用另一种称为非类型参数的模板参数。
+
+    *模板非类型形参是一个模板形参，其中形参的类型是预定义的，并替换为作为参数传入的 constexpr 值。
+        非类型参数：
+            模板非类型形参是一个模板形参，其中形参的类型是预定义的，并替换为作为参数传入的 constexpr 值。
+
+            非类型参数可以是以下任何类型：
+                *An integral type
+                *An enumeration type
+                *A pointer or reference to a class object
+                *A pointer or reference to a function
+                *A pointer or reference to a class member function
+                *std::nullptr_t
+                *A floating point type (since C++20)
+
+            eg:2-1
+
+                关于上述示例的一个值得注意的事情是我们不必动态分配 m_array 成员变量！这是因为对于 StaticArray 类的任何给定实例，大小必须是 constexpr。
+                    例如，如果您实例化一个 StaticArray<int, 12>，编译器会将 size 替换为 12。因此 m_array 是 int[12] 类型，可以静态分配。
+                    此功能由标准库类 std::array 使用。当你分配一个 std::array<int, 5> 时，int 是一个类型参数，而 5 是一个非类型参数！
+
+                note:
+                    请注意，如果您尝试使用非 constexpr 值实例化模板非类型参数，它将不起作用：
+
+
+   

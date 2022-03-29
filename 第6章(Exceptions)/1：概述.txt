@@ -1,0 +1,56 @@
+概述:
+    异常处理提供了一种机制，可以将错误或其他异常情况的处理与代码的典型控制流分离。
+    这允许在给定情况下最有用的时间和方式处理错误，从而减轻返回代码导致的许多（如果不是全部）混乱。
+
+
+throw:
+    在 C++ 中，throw 语句用于表示发生了异常或错误情况（考虑抛出惩罚标志）。发出异常发生的信号通常也称为引发异常。
+
+    要使用 throw 语句，只需使用 throw 关键字，后跟您希望用来表示发生错误的任何数据类型的值
+        通常，此值将是错误代码、问题描述或自定义异常类。
+            eg:
+                throw -1; // throw a literal integer value
+                throw ENUM_INVALID_INDEX; // throw an enum value
+                throw "Can not take square root of negative number"; // throw a literal C-style (const char*) string
+                throw dX; // throw a double variable that was previously defined
+                throw MyException("Fatal Error"); // Throw an object of class MyExcepti
+
+try:
+    在 C++ 中，我们使用 try 关键字来定义语句块（称为 try 块）。 try 块充当观察者，寻找由 try 块中的任何语句引发的任何异常。
+        eg:
+            try
+            {
+                // Statements that may throw exceptions you want to handle go here
+                throw -1; // here's a trivial throw statement
+            }
+
+        note：
+            请注意，try 块没有定义我们将如何处理异常。它只是告诉程序，“嘿，如果这个 try 块中的任何语句抛出异常，抓住它！”。
+
+catch：
+    catch 关键字用于定义处理单一数据类型异常的代码块（称为 catch 块）。
+
+    捕获参数的工作方式与函数参数一样，该参数在随后的捕获块中可用。
+        基本类型的异常可以通过值来捕获，但非基本类型的异常应该通过 const 引用来捕获，以避免进行不必要的复制。
+
+    Try 和cathc块一起工作
+        try 块检测 try 块中的语句引发的任何异常，并将它们路由到适当的 catch 块进行处理。
+            一个 try 块必须至少有一个紧随其后的 catch 块，但可以有多个按顺序列出的 catch 块
+
+        一旦异常被try块捕获并路由到catch块进行处理，该异常被认为已处理，并且在catch块之后将恢复正常执行。
+
+    catch(...):
+        C++ 为我们提供了一种机制来捕获所有类型的异常
+
+
+重述异常处理:
+    *当引发异常时（使用 throw），程序的执行会立即跳转到最近的封闭 try 块（如果需要，向上传播堆栈以找到封闭的 try 块）。
+        如果任何附加到 try 块的 catch 处理程序处理该类型的异常，则执行该处理程序并且该异常被视为已处理。
+
+    *如果不存在适当的 catch 处理程序，则程序的执行将传播到下一个封闭的 try 块。
+        如果在程序结束之前找不到合适的 catch 处理程序，程序将失败并出现异常错误。
+
+    note:
+        请注意，在将异常与 catch 块匹配时，编译器不会执行隐式转换或提升！例如，char 异常不会与 int catch 块匹配。 int 异常将不匹配 float catch 块。但是，将执行从派生类到其父类之一的强制转换。
+
+eg：1-1
