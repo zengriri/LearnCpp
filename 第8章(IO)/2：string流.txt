@@ -1,0 +1,17 @@
+简介:
+    允许您使用熟悉的插入 (<<) 和提取 (>>) 运算符来处理字符串。
+        与 istream 和 ostream 一样，字符串流提供了一个缓冲区来保存数据。但是，与 cin 和 cout 不同，这些流不连接到 I/O 通道（例如键盘、监视器等）。
+        字符串流的主要用途之一是缓冲输出以供稍后显示，或逐行处理输入。
+
+字符串有六个流类：
+    读写普通字符宽度字符串：
+        istringstream（派生自istream）
+        ostringstream（派生自ostream）
+        stringstream（派生自iostream）
+    
+    读写宽字符串：
+        wistringstream
+        wostringstream
+        wstringstream
+
+   note: in <sstream>头文件中
