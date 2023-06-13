@@ -8,8 +8,7 @@ class Person
 	std::shared_ptr<Person> m_partner; // initially created empty
 
 public:
-
-	Person(const std::string &name): m_name(name)
+	Person(const std::string &name) : m_name(name)
 	{
 		std::cout << m_name << " created\n";
 	}
@@ -34,8 +33,8 @@ public:
 
 int main()
 {
-	auto lucy { std::make_shared<Person>("Lucy") }; // create a Person named "Lucy"
-	auto ricky { std::make_shared<Person>("Ricky") }; // create a Person named "Ricky"
+	auto lucy{std::make_shared<Person>("Lucy")};   // create a Person named "Lucy"
+	auto ricky{std::make_shared<Person>("Ricky")}; // create a Person named "Ricky"
 
 	partnerUp(lucy, ricky); // Make "Lucy" point to "Ricky" and vice-versa
 

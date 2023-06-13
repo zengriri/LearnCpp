@@ -6,7 +6,7 @@
 
 int main()
 {
-  std::array<std::string_view, 4> arr{ "apple", "banana", "walnut", "lemon" };
+  std::array<std::string_view, 4> arr{"apple", "banana", "walnut", "lemon"};
 
   std::cout << "search for: ";
 
@@ -14,9 +14,8 @@ int main()
   std::cin >> search;
 
   // Capture @search                                vvvvvv
-  auto found{ std::find_if(arr.begin(), arr.end(), [search](std::string_view str) {
-    return (str.find(search) != std::string_view::npos);
-  }) };
+  auto found{std::find_if(arr.begin(), arr.end(), [search](std::string_view str)
+                          { return (str.find(search) != std::string_view::npos); })};
 
   if (found == arr.end())
   {

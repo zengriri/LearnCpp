@@ -8,7 +8,6 @@ class Person
 	std::weak_ptr<Person> m_partner; // note: This is now a std::weak_ptr
 
 public:
-
 	Person(const std::string &name) : m_name(name)
 	{
 		std::cout << m_name << " created\n";
@@ -32,13 +31,13 @@ public:
 	}
 
 	const std::shared_ptr<Person> getPartner() const { return m_partner.lock(); } // use lock() to convert weak_ptr to shared_ptr
-	const std::string& getName() const { return m_name; }
+	const std::string &getName() const { return m_name; }
 };
 
 int main()
 {
-	auto lucy { std::make_shared<Person>("Lucy") };
-	auto ricky { std::make_shared<Person>("Ricky") };
+	auto lucy{std::make_shared<Person>("Lucy")};
+	auto ricky{std::make_shared<Person>("Ricky")};
 
 	partnerUp(lucy, ricky);
 

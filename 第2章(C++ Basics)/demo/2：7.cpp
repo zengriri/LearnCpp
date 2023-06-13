@@ -2,17 +2,16 @@
 
 int main()
 {
-  int ammo{ 10 };
+  int ammo{10};
 
   auto shoot{
-    // We don't need mutable anymore
-    [&ammo]() { // &ammo means ammo is captured by reference
-      // Changes to ammo will affect main's ammo
-      --ammo;
+      // We don't need mutable anymore
+      [&ammo]() { // &ammo means ammo is captured by reference
+        // Changes to ammo will affect main's ammo
+        --ammo;
 
-      std::cout << "Pew! " << ammo << " shot(s) left.\n";
-    }
-  };
+        std::cout << "Pew! " << ammo << " shot(s) left.\n";
+      }};
 
   shoot();
 

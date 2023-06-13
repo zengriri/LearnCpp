@@ -1,25 +1,26 @@
 #include <iostream>
 #include <functional>
 
-void invoke(const std::function<void()>& fn)
+void invoke(const std::function<void()> &fn)
 {
-    fn();
+  fn();
 }
 
 int main()
 {
-    int i{ 0 };
+  int i{0};
 
-    // Increments and prints its local copy of @i.
-    auto count{ [i]() mutable {
-      std::cout << ++i << '\n';
-    } };
+  // Increments and prints its local copy of @i.
+  auto count{[i]() mutable
+             {
+               std::cout << ++i << '\n';
+             }};
 
-    invoke(count);
-    invoke(count);
-    invoke(count);
+  invoke(count);
+  invoke(count);
+  invoke(count);
 
-    return 0;
+  return 0;
 }
 
 /*
