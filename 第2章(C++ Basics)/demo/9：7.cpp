@@ -8,8 +8,7 @@ class Person
 	std::weak_ptr<Person> m_partner; // note: This is now a std::weak_ptr
 
 public:
-
-	Person(const std::string &name): m_name(name)
+	Person(const std::string &name) : m_name(name)
 	{
 		std::cout << m_name << " created\n";
 	}
@@ -34,8 +33,8 @@ public:
 
 int main()
 {
-	auto lucy { std::make_shared<Person>("Lucy") };
-	auto ricky { std::make_shared<Person>("Ricky") };
+	auto lucy{std::make_shared<Person>("Lucy")};
+	auto ricky{std::make_shared<Person>("Ricky")};
 
 	partnerUp(lucy, ricky);
 

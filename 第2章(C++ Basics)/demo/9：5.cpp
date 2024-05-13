@@ -11,9 +11,9 @@ public:
 int main()
 {
 	// allocate a Resource object and have it owned by std::shared_ptr
-	auto ptr1 { std::make_shared<Resource>() };
+	auto ptr1{std::make_shared<Resource>()};
 	{
-		auto ptr2 { ptr1 }; // create ptr2 using copy of ptr1
+		auto ptr2{ptr1}; // create ptr2 using copy of ptr1
 
 		std::cout << "Killing one shared pointer\n";
 	} // ptr2 goes out of scope here, but nothing happens

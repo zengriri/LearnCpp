@@ -2,17 +2,17 @@
 
 int main()
 {
-  int ammo{ 10 };
+  int ammo{10};
 
   auto shoot{
-    // Added mutable after the parameter list.
-    [ammo]() mutable {
-      // We're allowed to modify ammo now
-      --ammo;
+      // Added mutable after the parameter list.
+      [ammo]() mutable
+      {
+        // We're allowed to modify ammo now
+        --ammo;
 
-      std::cout << "Pew! " << ammo << " shot(s) left.\n";
-    }
-  };
+        std::cout << "Pew! " << ammo << " shot(s) left.\n";
+      }};
 
   shoot();
   shoot();

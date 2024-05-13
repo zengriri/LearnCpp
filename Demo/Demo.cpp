@@ -1,16 +1,11 @@
-﻿#include <cstdint>
-#include <iostream>
+﻿#include <iostream>
+
+int add(int x, int y); // forward declaration of add()
 
 int main()
 {
-    std::int16_t x{}; // x is 16 bits, holds from -32768 to 32767
-    std::cout << "Enter a number between -32768 and 32767: ";
-    std::cin >> x;
-
-    std::int16_t y{}; // y is 16 bits, holds from -32768 to 32767
-    std::cout << "Enter another number between -32768 and 32767: ";
-    std::cin >> y;
-
-    std::cout << "The sum is: " << x + y << '\n';
+    std::cout << "The sum of 3 and 4 is: " << add(3, 4) << '\n';
     return 0;
 }
+
+// note: No definition for function add

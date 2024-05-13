@@ -4,7 +4,7 @@
 
 int main()
 {
-  std::array areas{ 100, 25, 121, 40, 56 };
+  std::array areas{100, 25, 121, 40, 56};
 
   int width{};
   int height{};
@@ -14,12 +14,13 @@ int main()
 
   // We store areas, but the user entered width and height.
   // We need to calculate the area before we can search for it.
-  auto found{ std::find_if(areas.begin(), areas.end(),
-                           // Declare a new variable that's visible only to the lambda.
-                           // The type of userArea is automatically deduced to int.
-                           [userArea{ width * height }](int knownArea) {
-                             return (userArea == knownArea);
-                           }) };
+  auto found{std::find_if(areas.begin(), areas.end(),
+                          // Declare a new variable that's visible only to the lambda.
+                          // The type of userArea is automatically deduced to int.
+                          [userArea{width * height}](int knownArea)
+                          {
+                            return (userArea == knownArea);
+                          })};
 
   if (found == areas.end())
   {
