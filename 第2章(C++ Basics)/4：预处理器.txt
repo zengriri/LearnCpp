@@ -35,6 +35,36 @@
 定义的范围：
     一旦预处理器完成，该文件中所有定义的标识符都将被丢弃。这意味着指令仅从定义点到定义它们的文件末尾有效。在一个代码文件中定义的指令不会影响同一项目中的其他代码文件
 
+note:
+    在一个文件中定义的指令不会对其他文件产生任何影响（除非它们被 #included 到另一个文件中）
+
+    eg1:
+        #define FOO 9 // Here's a macro substitution
+        #ifdef FOO // This FOO does not get replaced because it’s part of another preprocessor directive
+            std::cout << FOO << '\n'; // This FOO gets replaced with 9 because it's part of the normal code
+        #endif
+
+        note:
+            宏仅导致非预处理器命令的文本替换。由于 #ifdef FOO 是预处理器命令，因此文本替换不适用于该命令中的 FOO
+
+    eg2:
+        #include <iostream>
+        void foo()
+        {
+        #define MY_NAME "Alex"
+        }
+
+        int main()
+        {
+            std::cout << "My name is: " << MY_NAME << '\n';
+
+            return 0;
+        }
+
+        note:
+            尽管看起来#define MY_NAME " Alex "是在函数foo中定义的，预处理器并不理解函数这样的c++概念。因此，此程序的行为与在函数foo之前或之后定义#define MY_NAME " Alex "的程序相同。
+            为了避免混淆，您通常需要在函数外部#define 标识符。
+
 
 
 
