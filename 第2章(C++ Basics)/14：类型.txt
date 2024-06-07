@@ -48,6 +48,33 @@ short int:16bit, int,:16bit long int:32bit,long long int:64bit
             5:任何特定于编译器的固定宽度整数
                 eg:Visual Studio 定义 __int8、__int16 等......
 
+float:4bytes,double:bytes,long double:bytes:
+    与整数一样，C++ 没有定义这些类型的实际大小（但它保证最小大小）
+
+    使用浮点文字时，始终至少包含一位小数（即使小数为 0）。这有助于编译器理解该数字是浮点数而不是整数
+        eg double y{5.0}
+
+    最佳实践:除非空间非常宝贵，否则优先选择双倍浮动，因为浮动缺乏精度通常会导致不准确。
+
+    结论:
+        1:浮点数对于存储非常大或非常小的数字非常有用，包括那些带有小数部分的数字
+        2:浮点数通常具有较小的舍入误差，即使该数字的有效位数少于精度.很多时候，这些数据会被忽视，因为它们太小，而且数字在输出时被截断。     
+            然而，浮点数的比较可能不会给出预期的结果。对这些值执行数学运算将导致舍入误差变大。   
+
+char:
+    char 数据类型被设计为保存单个字符。字符可以是单个字母、数字、符号或空格
+    char 数据类型是整型，这意味着基础值存储为整数
+    ASCII 代表美国信息交换标准代码，它定义了一种将英文字符（加上一些其他符号）表示为 0 到 127 之间的数字（称为 ASCII 代码或代码点）的特定方式。
+        例如，ASCII 代码 97 被解释为字符“a”。
+
+    *C++11 中添加了 char16_t 和 char32_t，以提供对 16 位和 32 位 Unicode 字符的显式支持。
+    *C++20 中添加了 char8_t 以提供对 8 位 Unicode (UTF-8) 的支持。它是一种独特的类型，使用与 unsigned char 相同的表示形式
+
+    警告:请注意不要将字符数与整数混淆。
+        eg:
+            char ch{5}; // initialize with integer 5 (stored as integer 5)
+            char ch{'5'}; // initialize with code point for '5' (stored as integer 53)
+
 
 bool,char:
     从技术上讲，bool 和 char 类型被认为是整型（因为这些类型将它们的值存储为整数值）
