@@ -2,8 +2,11 @@
 
 int main()
 {
-    int bin{ 0b1011'0010 };  // assign binary 1011 0010 to the variable
-    long value{ 2'132'673'462 }; // much easier to read than 2132673462
+    std::cout << (true ? 1 : 2) << '\n';    // okay: both operands have matching type int
+
+    std::cout << (false ? 1 : 2.2) << '\n'; // okay: int value 1 converted to double
+
+    std::cout << (true ? "ewrtert" : 2u) << '\n';  // surprising result: -1 converted to unsigned int, result out of range
 
     return 0;
 }
