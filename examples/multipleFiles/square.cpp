@@ -1,11 +1,13 @@
-#include "square.h"
+#include <iostream>
 
-int getSquareSides() // actual definition for getSquareSides
-{
-    return 4;
-}
+double circumference(double radius); // forward declaration
 
-int getSquarePerimeter(int sideLength)
+inline double pi() { return 3.14159; }
+
+int main()
 {
-    return sideLength * getSquareSides();
+    std::cout << pi() << '\n';
+    std::cout << circumference(2.0) << '\n';
+
+    return 0;
 }
