@@ -1,19 +1,21 @@
 ﻿#include <iostream>
-
-constexpr int greater(int x, int y) // now a constexpr function
-{
-    return (x > y ? x : y);
-}
+#include <string_view>
 
 int main()
 {
-    constexpr int x{ 5 };
-    constexpr int y{ 6 };
+	std::string_view str{ "Peach" };
+	std::cout << str << '\n';
 
-    // We'll explain why we use variable g here later in the lesson
-    constexpr int g{ greater(x, y) }; // will be evaluated at compile-time
+	// Remove 1 character from the left side of the view
+	str.remove_prefix(1);
+	std::cout << str << '\n';
 
-    std::cout << g << " is greater!\n";
+	// Remove 2 characters from the right side of the view
+	str.remove_suffix(2);
+	std::cout << str << '\n';
 
-    return 0;
+	str = "Peach"; // reset the view
+	std::cout << str << '\n';
+
+	return 0;
 }
