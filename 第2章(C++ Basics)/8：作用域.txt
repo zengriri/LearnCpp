@@ -1,7 +1,69 @@
+链接：
+    *标识符的链接决定了该名称的其他声明是否引用同一个对象
+        1：局部变量没有链接
+        2：全局变量和函数标识符可以具有内部链接或外部链接
+    
+    *内部链接：
+        1:具有内部链接的标识符可以在单个翻译单元中看到和使用，但不能从其他翻译单元访问（即，它不暴露给链接器）
+            这意味着，如果两个源文件具有具有内部链接的相同命名标识符，则这些标识符将被视为独立的（并且不会因具有重复定义而导致 ODR 违规)
+
+        2:具有内部链接的全局变量
+            具有内部链接的全局变量有时称为内部变量
+                *为了使非常量全局变量成为内部变量，我们使用 static 关键字
+                *Const 和 constexpr 全局变量默认具有内部链接（因此不需要 static 关键字——如果使用它，它将被忽略）。
+                    eg :
+                        static int g_x{}; // non-constant globals have external linkage by default, but can be given internal linkage via the static keyword
+                        const int g_y{ 1 }; // const globals have internal linkage by default
+                        constexpr int g_z{ 2 }; // constexpr globals have internal linkage by default
+        
+        3:具有内部链接的函数：
+            因为链接是标识符（而不是变量）的属性，所以函数标识符具有与变量标识符相同的链接属性
+                函数默认为外部链接（我们将在下一课中介绍），但可以通过 static 关键字设置为内部链
+                    eg:
+                        // This function is declared as static, and can now be used only within this file
+                        // Attempts to access it from another file via a function forward declaration will fail
+                        [[maybe_unused]] static int add(int x, int y)
+                        {
+                            return x + y;
+                        }
+
+
+    *外部链接
+        1：函数默认具有外部链接:
+            为了调用在另一个文件中定义的函数，您必须在希望使用该函数的任何其他文件中放置该函数的前向声明。前向声明告诉编译器该函数的存在，链接器将函数调用连接到实际的函数定义
+
+        2:具有外部链接的全局变量:
+            *具有外部链接的全局变量有时称为外部变量。要使全局变量成为外部变量（从而可以被其他文件访问），我们可以使用 extern 关键字来执行此操作：
+                eg:
+                    int g_x { 2 }; // non-constant globals are external by default
+                    extern const int g_y { 3 }; // const globals can be defined as extern, making them external
+                    extern constexpr int g_z { 3 }; // constexpr globals can be defined as extern, making them external (but this is pretty useless, see the warning in the next section)
+            
+            *通过 extern 关键字进行变量前向声明:
+                要实际使用已在另一个文件中定义的外部全局变量，您还必须在希望使用该变量的任何其他文件中放置该全局变量的前向声明
+
+            note:
+                1:虽然constexpr变量可以通过extern关键字获得外部链接，但它们不能被前向声明为constexpr。
+                    这是因为编译器需要知道constexpr变量的值(在编译时)。如果该值是在其他文件中定义的，则编译器无法看到在其他文件中定义的值.
+                    但是，您可以将 constexpr 变量向前声明为 const，编译器会将其视为运行时 const。这并不是特别有用。
+                2:函数前向声明不需要 extern 关键字 - 编译器能够根据您是否提供函数体来判断您是在定义新函数还是进行前向声明
+                    变量前向声明确实需要 extern 关键字来帮助区分未初始化的变量定义和变量前向声明（它们看起来相同）
+
+                
+
 局部变量：
     局部变量具有块范围，这意味着它们从定义点到定义它们的块的末尾都在范围内。
 
     局部变量具有自动存储持续时间，这意味着它们在定义点创建并在定义它们的块的末尾销毁。
+
+    静态局部变量：
+        初始化静态局部变量。静态局部变量仅在第一次执行代码时初始化，而不会在后续调用时初始化
+
+
+    note:
+        *局部变量没有链接
+        *静态局部变量与局部变量一样具有块作用域，但其生存期与全局变量一样直到程序结束
+        *当函数需要无法在函数外部直接访问的持久对象时，可以使用静态局部变量
 
 
 全局变量：
@@ -28,6 +90,15 @@
                     const int g_y { 1 };  // const global variable g_y, initialized with a value
                     constexpr int g_z { 2 }; // constexpr global variable g_z, initialized with a value
 
+    全局变量也可以在用户定义的命名空间内定义。
+            eg：    g_x 已从全局范围移至用户定义的命名空间 Foo 中 （尽管标识符 g_x 现在仅限于命名空间 Foo 的范围，但该名称仍然可以全局访问（通过 Foo::g_x），并且 g_x 仍然是一个全局变量）
+                namespace Foo // Foo is defined in the global scope
+                {
+                    int g_x {}; // g_x is now inside the Foo namespace, but is still a global variable
+                }
+
+            
+
 
 全局变量的链接:
 
@@ -41,8 +112,75 @@
                 constexpr int g_x { 2 }; // this internal g_x is only accessible within a.cpp
 
 
+Scope, duration, and linkage summary：
+    *Scope summary：标识符的范围决定了可以在源代码中的何处访问该标识符。
+        1：具有块（局部）作用域的变量只能从声明点到声明它们的块末尾（包括嵌套块）进行访问
+            这包括：
+                1：局部变量
+                2：函数参数
+                3：在块内声明的程序定义的类型定义（例如枚举和类）
 
+        2：具有全局作用域的变量和函数可以从声明点到文件末尾进行访问
+            这包括：
+                1：全局变量
+                2：函数
+                3：在命名空间内或全局范围内声明的程序定义的类型定义（例如枚举和类）
+
+    *Duration summary：变量的持续时间决定了它的创建和销毁时间
+        1：具有自动持续时间的变量在定义时创建，并在退出它们所属的块时销毁
+            这包括：   
+                1：局部变量
+                2：在块内声明的程序定义的类型标识符（例如枚举和类）
         
+        2：具有内部链接的标识符意味着同一翻译单元内相同标识符的声明引用相同的对象或函数：
+            标识符具有内部链接的实体包括：
+                1：静态全局变量（已初始化或未初始化
+                2：静态函数
+                3：常量全局变量（Const global variables）
+                4：未命名的命名空间以及其中定义的任何内容
+
+        3：具有外部链接的标识符意味着整个程序中相同标识符的声明引用相同的对象或函数
+            标识符具有外部链接的实体包括：
+                1：非静态函数
+                2：非常量全局变量（已初始化或未初始化）
+                3:外部常量全局变量(Extern const global variables)
+                4:内联常量全局变量
+                4:命名空间(Namespaces)
+
+    Type                                                Example                                 Scope           During          linkage         Notes
+
+    Local variable	                                    int x;	                                Block	        Automatic	    None	
+    Static local variable	                            static int s_x;	                        Block	        Static	        None	
+    Dynamic local variable	                            int* x { new int{} };	                Block	        Dynamic	        None	
+    Function parameter	                                void foo(int x)	                        Block	        Automatic	    None	
+    External non-constant global variable	            int g_x;	                            Global	        Static	        External	    Initialized or uninitialized
+    Internal non-constant global variable	            static int g_x;	                        Global	        Static	        Internal	    Initialized or uninitialized
+    Internal constant global variable	                constexpr int g_x { 1 };	            Global	        Static	        Internal	    Must be initialized
+    External constant global variable	                extern const int g_x { 1 };	            Global	        Static	        External	    Must be initialized
+    Inline constant global variable (C++17)	            nline constexpr int g_x { 1 };	        Global	        Static	        External	    Must be initialized
+
+
+    当用作标识符声明的一部分时，static 和 extern 关键字称为存储类说明符。在这种情况下，他们设置了标识符的存储持续时间和链接
+    C++ 支持 4 个活动存储类说明符：
+        Specifier	            Meaning	Note                                                                        Note
+
+        extern	                static (or thread_local) storage duration and external linkage	
+        static	                static (or thread_local) storage duration and internal linkage	
+        thread_local	        thread storage duration	
+        mutable	                object allowed to be modified even if containing class is const	
+        auto	                automatic storage duration	                                                        Deprecated in C++11
+        register	            automatic storage duration and hint to the compiler to place in a register	        Deprecated in C++17
+
+
+
+ note:
+    *不要将自定义功能添加到 std 命名空间。这样做大多数时候会导致未定义的行为，因为 std 命名空间有一条特殊规则，禁止用户代码扩展。
+    *范围决定了在代码中可以看到和使用单个标识符的声明。链接确定同一标识符的多个声明是否引用同一对象。
+    *更喜欢在命名空间内而不是在全局命名空间中定义全局变量
+    *命名全局变量（尤其是在全局命名空间中定义的变量）时，请考虑使用“g”或“g_”前缀，以帮助区分它们与局部变量和函数参数
+    *尽可能使用局部变量而不是全局变量。
+    *函数默认具有外部链接。可以使用 static 关键字将它们设置为内部
+
 
 
     
