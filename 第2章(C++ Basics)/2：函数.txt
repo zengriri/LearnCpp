@@ -303,9 +303,107 @@
                 eg：2-9，2-10，2-11
 
 
-        
+函数重载:
+    *重载函数如何区分：
+        包括:
+            1：函数参数个数
+            2：函数参数类型
+        不包括:
+            1:返回类型
+            2：对于按值传递的参数，也不考虑 const 限定符。
+                eg:
+                    void print(int);
+                    void print(const int); // not differentiated from print(int)
 
+    *解决重载函数调用:当对重载函数进行函数调用时，编译器将逐步执行一系列规则，以确定哪个（如果有）重载函数是最佳匹配
+        参数匹配序列:
+            步骤1: 编译器尝试找到完全匹配。这分两个阶段发生
+                1:首先，编译器将查看是否存在重载函数，其中函数调用中的参数类型与重载函数中的参数类型完全匹配。
+                2:其次，编译器将对函数调用中的参数应用许多简单的转换。
+                    简单转换是一组特定的转换规则，它们将修改类型（而不修改值）以查找匹配项。这些包括
+                        <1>:左值到右值的转换
+                        <2>:限定转换（例如非 const 到 const）
+                        <3>非引用到引用的转换
+
+            步骤2: 如果未找到完全匹配，编译器会尝试通过对参数应用数字提升来查找匹配。
+                我们介绍了如何将某些窄整型和浮点类型自动提升为更宽的类型，例如 int 或 double.如果在数字提升之后找到匹配项，则函数调用将得到解决。
+
+            步骤3: 如果通过数字提升未找到匹配项，编译器会尝试通过对参数应用数字转换来查找匹配项
+
+            步骤4: 如果通过数值转换未找到匹配项，编译器将尝试通过任何用户定义的转换来查找匹配项。
+
+            步骤5: 如果通过用户定义的转换未找到匹配项，编译器将查找使用省略号的匹配函数
+
+            步骤6: 如果此时尚未找到匹配项，编译器将放弃并发出有关无法找到匹配函数的编译错误
+
+
+delete函数：
+    如果我们明确不想调用一个函数，我们可以使用 = delete 说明符将该函数定义为已删除。如果编译器将函数调用与已删除的函数相匹配，则编译将因编译错误而停止。
+    
+        eg:
+            #include <iostream>
+
+            void printInt(int x)
+            {
+                std::cout << x << '\n';
+            }
+
+            void printInt(char) = delete; // calls to this function will halt compilation
+            void printInt(bool) = delete; // calls to this function will halt compilation
+
+            int main()
+            {
+                printInt(97);   // okay
+
+                printInt('a');  // compile error: function deleted
+                printInt(true); // compile error: function deleted
+
+                printInt(5.0);  // compile error: ambiguous match
+
+                return 0;
+            }
+
+    Key insight:
+        =删除的意思是“我禁止这个”，而不是“这个不存在”。删除的函数参与函数重载决策的所有阶段（不仅仅是精确匹配阶段）。如果选择了已删除的函数，则会出现编译错误
+
+    删除所有不匹配的重载:删除一堆单独的函数重载效果很好，但可能很冗长。有时我们可能希望仅使用类型与函数参数完全匹配的参数来调用某个函数。我们可以通过使用函数模板来完成此操作
+        eg：
+            #include <iostream>
+            // This function will take precedence for arguments of type int
+            void printInt(int x)
+            {
+                std::cout << x << '\n';
+            }
+            // This function template will take precedence for arguments of other types
+            // Since this function template is deleted, calls to it will halt compilation
+            template <typename T>
+            void printInt(T x) = delete;
+
+            int main()
+            {
+                printInt(97);   // okay
+                printInt('a');  // compile error
+                printInt(true); // compile error
+
+                return 0;
+            }
+                        
+默认参数：
+    进行函数调用时，调用者可以选择为任何具有默认参数的函数参数提供参数。如果调用者提供参数，则使用函数调用中参数的值。如果调用者未提供参数，则使用默认参数的值。
+
+    规则:
+        1:在函数调用中，任何显式提供的参数都必须是最左边的参数（不能跳过具有默认值的参数）
+        2:如果为参数指定了默认参数，则所有后续参数（右侧）也必须指定为默认参数。
+        3：如果多个参数具有默认参数，则最左边的参数应该是最有可能由用户显式设置的参数。
        
+    默认参数不能重新声明，必须在使用前声明：
+        一旦声明，默认参数就不能在同一翻译单元中重新声明。这意味着对于具有前向声明和函数定义的函数，默认参数可以在前向声明或函数定义中声明，但不能同时在两者中声明。
+
+        最佳实践是在前向声明中而不是在函数定义中声明默认参数，因为前向声明更有可能被其他文件看到并在使用前包含（特别是在头文件中）。
+
+        Best practice：
+            *如果函数有前向声明（尤其是头文件中的声明），请将默认参数放在那里。否则，将默认参数放入函数定义中。
+
 
 
         

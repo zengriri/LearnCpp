@@ -1,11 +1,21 @@
 #include <iostream>
+#include <string_view>
 
-extern int g_x; // this extern is a forward declaration of a variable named g_x that is defined somewhere else
-extern const int g_y; // this extern is a forward declaration of a const variable named g_y that is defined somewhere else
+void print(std::string_view s)
+{
+    std::cout << s << '\n';
+}
+
+void print(char c = ' ')
+{
+    std::cout << c << '\n';
+}
 
 int main()
 {
-    std::cout << g_x << ' ' << g_y << '\n'; // prints 2 3
+    print("Hello, world"); // resolves to print(std::string_view)
+    print('a'); // resolves to print(char)
+    print(); // resolves to print(char)
 
     return 0;
 }

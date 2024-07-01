@@ -101,6 +101,46 @@ void类型： 表示没有类型
         *3:void指针
             也称为通用指针，是一种特殊类型的指针，可以指向任何数据类型的对象！ void 指针的声明方式与普通指针类似，使用 void 关键字作为指针的类型
 
+类型别名：
+    *using:可为现有数据类型创建别名
+            别名实际上并不定义一个新的、不同的类型（被认为与其他类型分开的类型）——它只是为现有类型引入一个新的标识符。类型别名与别名类型完全可以互换
+                eg: using Speed = long;
+
+    *Typedefs：typedef（“type definition”的缩写）是一种为类型创建别名的较旧方法。要创建 typedef 别名，我们使用 typedef 关键字
+        出于向后兼容性的原因，Typedef 仍在 C++ 中使用，但它们已在很大程度上被现代 C++ 中的类型别名所取代
+            eg:
+                typedef long Miles;
+                using Miles = long;
+
+        对于更复杂的类型，typedef 的语法可能会变得丑陋
+            eg:
+                typedef int (*FcnType)(double, char); // FcnType hard to find
+                using FcnType = int(*)(double, char); // FcnType easier to find
+
+    Best practice:优先使用类型别名而不是 typedef
+
+auto:推导类型
+    note:
+        *在大多数情况下，类型推导将从推导类型中删除 const 或 constexpr 限定符.
+            如果您希望推导类型为 const 或 constexpr，则必须自己提供 const 或 constexpr。为此，只需将 const 或 constexpr 关键字与 auto 关键字结合使用即可
+            eg:
+                int main()
+                {
+                    const int x { 5 };  // x has type const int (compile-time const)
+                    auto y { x };       // y will be type int (const is dropped)
+
+                    constexpr auto z { x }; // z will be type constexpr int (constexpr is reapplied)
+
+                    return 0;
+                }
+
+        *类型推导不能用于函数参数类型
+            不幸的是，类型推导不适用于函数参数，并且在 C++20 之前，上述程序无法编译（您将收到有关函数参数无法具有自动类型的错误)
+            在C++20中，扩展了auto关键字，以便上述程序能够正确编译并运行,
+                但是，在这种情况下， auto 不会调用类型推导。相反，它触发了一个称为函数模板的不同功能，该功能旨在实际处理此类情况
+
+        Best practice:
+            *当对象的类型无关紧要时，对变量使用类型推导。
 
 
 章节回顾:
