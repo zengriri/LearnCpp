@@ -1,21 +1,23 @@
 #include <iostream>
-#include <string_view>
 
-void print(std::string_view s)
+void print()
 {
-    std::cout << s << '\n';
+    std::cout << "void\n";
 }
 
-void print(char c = ' ')
+void print(int x = 0)
 {
-    std::cout << c << '\n';
+    std::cout << "int " << x << '\n';
+}
+
+void print(double x)
+{
+    std::cout << "double " << x << '\n';
 }
 
 int main()
 {
-    print("Hello, world"); // resolves to print(std::string_view)
-    print('a'); // resolves to print(char)
-    print(); // resolves to print(char)
+    print(5.0f);
 
     return 0;
 }

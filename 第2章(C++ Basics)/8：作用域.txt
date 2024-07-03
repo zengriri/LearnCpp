@@ -50,7 +50,6 @@
                     变量前向声明确实需要 extern 关键字来帮助区分未初始化的变量定义和变量前向声明（它们看起来相同）
 
                 
-
 局部变量：
     局部变量具有块范围，这意味着它们从定义点到定义它们的块的末尾都在范围内。
 
@@ -96,8 +95,6 @@
                 {
                     int g_x {}; // g_x is now inside the Foo namespace, but is still a global variable
                 }
-
-            
 
 
 全局变量的链接:

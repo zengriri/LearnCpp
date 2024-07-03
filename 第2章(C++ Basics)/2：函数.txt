@@ -387,7 +387,8 @@ delete函数：
 
                 return 0;
             }
-                        
+
+
 默认参数：
     进行函数调用时，调用者可以选择为任何具有默认参数的函数参数提供参数。如果调用者提供参数，则使用函数调用中参数的值。如果调用者未提供参数，则使用默认参数的值。
 
@@ -403,6 +404,273 @@ delete函数：
 
         Best practice：
             *如果函数有前向声明（尤其是头文件中的声明），请将默认参数放在那里。否则，将默认参数放入函数定义中。
+
+
+模板函数：
+    *函数模板是一种类似函数的定义，用于生成一个或多个重载函数，每个重载函数具有一组不同的实际类型。这将使我们能够创建可以与许多不同类型一起使用的函数。
+
+        eg:
+            template <typename T>
+            T max(T x, T y)
+            {
+                return (x < y) ? y : x;
+            }
+            注：在这种情况下，typename 和 class 关键字没有区别。您经常会看到人们使用 class 关键字，因为它是较早引入到语言中的。
+                但是，我们更喜欢较新的 typename 关键字，因为它更清楚地表明类型模板参数可以替换为任何类型（例如基本类型），而不仅仅是类类型
+
+    *函数模板实际上并不是函数——它们的代码不会直接编译或执行。相反，函数模板只有一项工作：生成函数（被编译和执行）
+    
+    *实例化函数的过程很简单：编译器本质上克隆了主模板，并将模板类型 (T) 替换为我们指定的实际类型 (int)
+
+    *只要实例化函数模板在语法上有意义，编译器就会成功编译它。然而，编译器没有任何方法来检查这样的函数在语义上是否确实有意义。
+        
+        eg:
+            #include <iostream>
+
+            template <typename T>
+            T addOne(T x)
+            {
+                return x + 1;
+            }
+
+            int main()
+            {
+                std::cout << addOne("Hello, world!") << '\n';
+
+                return 0;
+            }            //注：在此示例中，我们对 C 样式字符串文字调用 addOne()。这在语义上实际上意味着什么？谁知道！也许令人惊讶的是，因为 C++ 在语法上允许将整数值添加到字符串文字中
+
+        note:
+            只要语法上有效，编译器就会实例化并编译语义上没有意义的函数模板。您有责任确保使用有意义的参数调用此类函数模板。
+
+    *我们可以告诉编译器不允许使用某些参数实例化函数模板
+        eg:
+            #include <iostream>
+            #include <string>
+
+            template <typename T>
+            T addOne(T x)
+            {
+                return x + 1;
+            }
+
+            // Use function template specialization to tell the compiler that addOne(const char*) should emit a compilation error
+            // const char* will match a string literal
+            template <>
+            const char* addOne(const char* x) = delete;
+
+            int main()
+            {
+                std::cout << addOne("Hello, world!") << '\n'; // compile error
+
+                return 0;
+            }       
+
+    *static local variables:
+        当在函数模板中使用静态局部变量时，从该模板实例化的每个函数都将具有静态局部变量的单独版本
+
+
+    *在多个文件中使用函数模板
+        eg: 
+        //main.cpp 
+            #include <iostream>
+            template <typename T>
+            T addOne(T x); // function template forward declaration
+
+            int main()
+            {
+                std::cout << addOne(1) << '\n';
+                std::cout << addOne(2.3) << '\n';
+
+                return 0;
+            }
+        //add.cpp
+            template <typename T>
+            T addOne(T x) // function template definition
+            {
+                return x + 1;
+            }
+        
+         注：如果 addOne 是非模板函数，则该程序可以正常工作：在 main.cpp 中，编译器会对 addOne 的前向声明感到满意，并且链接器会将 main.cpp 中对 addOne() 的调用连接到 add.cpp 中的函数定义.
+            但是因为 addOne 是一个模板，所以这个程序不起作用，我们得到一个链接器错误：
+
+        原因：
+            在 main.cpp 中，我们调用 addOne<int> 和 addOne<double>。但是，由于编译器看不到函数模板 addOne 的定义，因此无法在 main.cpp 中实例化这些函数。
+                不过，它确实看到了 addOne 的前向声明，并且会假设这些函数存在于其他地方，并将在稍后链接。
+            当编译器去编译add.cpp时，它会看到函数模板addOne的定义。但是，add.cpp 中没有使用此模板，因此编译器不会实例化任何内容。
+                最终结果是链接器无法将对 main.cpp 中的 addOne<int> 和 addOne<double> 的调用连接到实际函数，因为这些函数从未实例化。
+
+        As an aside:
+            如果 add.cpp 已实例化这些函数，则该程序将可以正常编译和链接。但这样的解决方案很脆弱，
+            应该避免：
+                如果后来更改了 add.cpp 中的代码，使这些函数不再实例化，则程序将再次无法链接
+                或者，如果 main.cpp 调用了未在 add.cpp 中实例化的不同版本的 addOne（例如 addOne<float>），我们会遇到同样的问题。
+
+        解决方案：
+            解决此问题的最传统方法是将所有模板代码放入头文件 (.h)，而不是源文件 (.cpp)：
+
+        ODR:
+            您可能想知道为什么这不会导致违反单一定义规则 (ODR)。 ODR 规定类型、模板、内联函数和内联变量允许在不同文件中具有相同的定义.
+
+            模板定义不受单一定义规则的限制，即每个程序只需要一个定义，因此将相同的模板定义 #included 到多个源文件中不是问题.
+                从函数模板隐式实例化的函数是隐式内联的，因此它们可以在多个文件中定义，只要每个定义都是相同的.
+                模板本身不是内联的，因为内联的概念仅适用于变量和函数
+
+        Best practice:
+            多个文件中需要的模板应在头文件中定义，然后在需要的地方#included。这允许编译器查看完整的模板定义并在需要时实例化模板
+
+     *具有多个模板类型参数的函数模板   
+        eg:
+            //由于 T 和 U 是独立的模板参数，因此它们彼此独立地解析其类型。这意味着 T 和 U 可以解析为不同类型，也可以解析为相同类型
+            #include <iostream>
+            template <typename T, typename U> // We're using two template type parameters named T and U
+            T max(T x, U y) // x can resolve to type T, and y can resolve to type U
+            {
+                return (x < y) ? y : x; // uh oh, we have a narrowing conversion problem here
+            }
+
+            int main()
+            {
+                std::cout << max(2, 3.5) << '\n'; // resolves to max<int, double>
+
+                return 0;
+            }
+
+    *auto(C++20):
+        C++20 引入了 auto 关键字的新用法:
+            当普通函数中使用 auto 关键字作为参数类型时，编译器会自动将函数转换为函数模板，每个 auto 参数成为独立的模板类型参数,
+                这种创建函数模板的方法称为缩写函数模板
+                    eg:
+                        auto max(auto x, auto y)
+                        {
+                            return (x < y) ? y : x;
+                        }           
+            *如果您希望每个模板类型参数都是独立类型，则首选此形式，因为删除模板参数声明行使您的代码更加简洁和可读。   
+
+            *Best practice:
+                请随意使用带有单个自动参数的缩写函数模板，或者每个自动参数应该是独立类型（并且您的语言标准设置为 C++20 或更高版本）。 
+
+    *overloaded:
+        就像函数可能被重载一样，函数模板也可能被重载。此类重载可以具有不同数量的模板类型和/或不同数量或类型的函数参数
+            eg:
+                #include <iostream>
+
+                // Add two values with matching types
+                template <typename T>
+                T add(T x, T y)
+                {
+                    return x + y;
+                }
+
+                // Add two values with non-matching types
+                // As of C++20 we could also use auto add(auto x, auto y)
+                template <typename T, typename U>
+                T add(T x, U y)
+                {
+                    return x + y;
+                }
+
+                // Add three values with any type
+                // As of C++20 we could also use auto add(auto x, auto y, auto z)
+                template <typename T, typename U, typename V>
+                T add(T x, U y, V z)
+                {
+                    return x + y + z;
+                }
+
+                int main()
+                {
+                    std::cout << add(1.2, 3.4) << '\n'; // instantiates and calls add<double>()
+                    std::cout << add(5.6, 7) << '\n';   // instantiates and calls add<double, int>()
+                    std::cout << add(8, 9, 10) << '\n'; // instantiates and calls add<int, int, int>()
+
+                    return 0;
+                }            
+
+
+非类型模板参数:
+    非类型模板参数是具有固定类型的模板参数，用作作为模板参数传入的 constexpr 值的占位符,
+     就像 T 通常用作第一个类型模板参数的名称一样，N 通常用作 int 非类型模板参数的名称
+  
+    非类型模板参数可以是以下任何类型：
+        .An integral type
+        .An enumeration type
+        .std::nullptr_t
+        .A floating point type (since C++20)
+        .A pointer or reference to an object
+        .A pointer or reference to a function
+        .A pointer or reference to a member function
+        .A literal class type (since C++20)
+
+        eg:
+            #include <iostream>
+
+            template <int N> // declare a non-type template parameter of type int named N
+            void print()
+            {
+                std::cout << N << '\n'; // use value of N here
+            }
+
+            int main()
+            {
+                print<5>(); // 5 is our non-type template argument
+
+                return 0;
+            }
+
+        Best practice:
+            使用 N 作为 int 非类型模板参数的名称
+
+        Key insight:
+            非类型模板参数主要在我们需要将 constexpr 值传递给函数（或类类型）时使用，以便它们可以在需要常量表达式的上下文中使用
+                类类型 std::bitset 使用非类型模板参数来定义要存储的位数，因为位数必须是 constexpr 值
+
+                eg:
+                    #include <cmath> // for std::sqrt
+                    #include <iostream>
+
+                    template <double D> // requires C++20 for floating point non-type parameters
+                    double getSqrt()
+                    {
+                        static_assert(D >= 0.0, "getSqrt(): D must be non-negative");
+
+                        if constexpr (D >= 0) // ignore the constexpr here for this example
+                            return std::sqrt(D); // strangely, std::sqrt isn't a constexpr function (until C++26)
+
+                        return 0.0;
+                    }
+
+                    int main()
+                    {
+                        std::cout << getSqrt<5.0>() << '\n';
+                        std::cout << getSqrt<-5.0>() << '\n';
+
+                        return 0;
+                    }
+
+        非类型模板参数的隐式转换:
+            某些非类型模板参数可以隐式转换，以匹配不同类型的非类型模板参数
+
+        使用 auto C++17 对非类型模板参数进行类型推导:
+            从 C++17 开始，非类型模板参数可以使用 auto 让编译器从模板实参推导出非类型模板参数:
+                eg：    
+                    #include <iostream>
+
+                    template <auto N> // deduce non-type template parameter from template argument
+                    void print()
+                    {
+                        std::cout << N << '\n';
+                    }
+
+                    int main()
+                    {
+                        print<5>();   // N deduced as int `5`
+                        print<'c'>(); // N deduced as char `c`
+
+                        return 0;
+                    }
+
+        
 
 
 
