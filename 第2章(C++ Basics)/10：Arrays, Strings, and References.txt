@@ -28,7 +28,7 @@ std::string_view(c++17)：
 
     note:
         *std::string_view 在其整个生命周期中仍然依赖于初始化器。如果正在使用视图时修改或销毁正在查看的字符串，则会导致意外或未定义的行为
-        *修改 std::string 会使该 std::string 的所有视图无效。
+        *修改 std::string 会使该 std::string_view 的所有视图无效。
 
  arrays
     fix array:
@@ -86,6 +86,15 @@ Best practice:
         5：std::string_view 可能会或可能不会以 null 终止。
 
 
+reference:
+    Best practice:
+        1:根据经验，按值传递基本类型，并按 const 引用传递类（或结构）类型
+        2:其他按值传递的常见类型：枚举类型和 std::string_view
+        3:通过（const）引用传递的其他常见类型：std::string、std::array 和 std::vector
+
+        4:对于复制成本较低的对象，复制的成本与绑定的成本相似，因此我们倾向于按值传递，这样生成的代码会更快。
+        5:对于复制成本较高的对象，复制的成本占主导地位，因此我们倾向于传递（const）引用以避免进行复制
+    
 
 
 

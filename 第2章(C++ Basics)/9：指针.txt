@@ -1,3 +1,123 @@
+概述：
+    指针是一个将内存地址（通常是另一个变量）作为其值的对象。这允许我们存储其他对象的地址以供稍后使用
+        与使用与号 (&) 字符声明引用类型非常相似，指针类型使用星号 (*) 声明
+            eg:
+                int;  // a normal int
+                int&; // an lvalue reference to an int value
+
+                int*; // a pointer to an int value (holds the address of an integer value)   
+
+    指针初始化:
+        与普通变量一样，指针默认情况下不会初始化。未初始化的指针有时称为野指针。野指针包含垃圾地址，取消引用通配指针将导致未定义的行为.因此，您应该始终将指针初始化为已知值
+            eg:
+                #include <iostream>
+                int main()
+                {
+                    int x{ 5 };
+                    std::cout << x << '\n'; // print the value of variable x
+
+                    int* ptr{ &x }; // ptr holds the address of x
+                    std::cout << *ptr << '\n'; // use dereference operator to print the value at the address that ptr is holding (which is x's address)
+
+                    return 0;
+                }
+
+
+        note:
+            此星号(*)是指针声明语法的一部分，而不是取消引用运算符的使用
+
+    引用和指针的区别:
+        *引用必须初始化，指针不需要初始化（但应该初始化）
+        *引用不是对象，指针才是
+        *引用不能被重新定位（更改为引用其他内容），指针可以更改它们所指向的内容
+        *引用必须始终绑定到一个对象，指针可以指向空的
+        *引用是“安全的”（悬空引用之外），指针本质上是危险的
+
+            note:
+                *优先选择通过引用传递而不是通过地址传递，除非您有特定原因要使用通过地址传递
+                *优先选择按引用返回而不是按地址返回，除非返回“无对象”（使用 nullptr）的能力很重要
+
+            example:
+
+                #include <iostream>
+                void printByValue(int val) // The function parameter is a copy of the argument
+                {
+                    std::cout << val << '\n'; // print the value via the copy
+                }
+                void printByReference(const int& ref) // The function parameter is a reference that binds to the argument
+                {
+                    std::cout << ref << '\n'; // print the value via the reference
+                }
+                void printByAddress(const int* ptr) // The function parameter is a pointer that holds the address of the argument
+                {
+                    std::cout << *ptr << '\n'; // print the value via the dereferenced pointer
+                }
+                int main()
+                {
+                    printByValue(5);     // valid (but makes a copy)
+                    printByReference(5); // valid (because the parameter is a const reference)
+                    printByAddress(&5);  // error: can't take address of r-value
+                    return 0;
+                }            
+
+
+    null pointers:
+        当指针持有空值时，意味着该指针没有指向任何东西。这样的指针称为空指针
+            eg:
+                int* ptr {}; // ptr is now a null pointer, and is not holding an address
+                int* ptr2= nullptr;
+
+        note:
+            *现代 C++ 中应避免使用 0 和 NULL（使用 nullptr 代替）。
+            *由于 nullptr 可以与函数重载中的整数值区分开来，因此它必须具有不同的类型,其类型为:std::nullptr_t (defined in header <cstddef>)
+                std::nullptr_t 只能保存一个值：nullptr
+
+                    eg:
+                        #include <iostream>
+                        #include <cstddef> // for std::nullptr_t
+                        void print(std::nullptr_t)
+                        {
+                            std::cout << "in print(std::nullptr_t)\n";
+                        }
+                        void print(int*)
+                        {
+                            std::cout << "in print(int*)\n";
+                        }
+                        int main()
+                        {
+                            print(nullptr); // calls print(std::nullptr_t)
+
+                            int x { 5 };
+                            int* ptr { &x };
+
+                            print(ptr); // calls print(int*)
+
+                            ptr = nullptr;
+                            print(ptr); // calls print(int*) (since ptr has type int*)
+
+                            return 0;
+                        }                    
+
+    地址运算符(&):返回其操作数的内存地址
+    解引用运算符(*):（有时也称为间接运算符）将给定内存地址处的值作为左值返回：
+        eg:
+            #include <iostream>
+            int main()
+            {
+                int x{ 5 };
+                std::cout << x << '\n';  // print the value of variable x
+                std::cout << &x << '\n'; // print the memory address of variable x
+
+                std::cout << *(&x) << '\n'; // print the value at the memory address of variable x (parentheses not required, but make it easier to read)
+
+                return 0;
+            }
+
+        Key insight：
+            *给定一个内存地址，我们可以使用解引用运算符 (*) 来获取该地址处的值（作为左值
+            *地址操作符 (&) 和解引用操作符 (*) 的作用相反：地址操作符获取对象的地址，而解引用获取某个地址处的对象。
+
+
 void pointer：
     void 指针，也称为泛型指针，是一种特殊类型的指针，可以指向任何数据类型的对象
         eg:

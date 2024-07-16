@@ -1,23 +1,15 @@
 #include <iostream>
+#include <string>
 
-void print()
+struct  Fraction
 {
-    std::cout << "void\n";
-}
-
-void print(int x = 0)
-{
-    std::cout << "int " << x << '\n';
-}
-
-void print(double x)
-{
-    std::cout << "double " << x << '\n';
-}
+    int numerator{};
+    int denominator{};
+    std::string str;
+};
 
 int main()
 {
-    print(5.0f);
-
+    Fraction f{};
     return 0;
 }

@@ -1,0 +1,79 @@
+lvalues and rvalues(左值与右值):
+    *识别左值和右值表达式的经验法则：
+        lvalues:左值表达式是那些计算结果为变量或其他可识别对象的表达式，这些对象在表达式末尾持续存在
+        rvalues:右值表达式是那些计算结果为由函数/运算符返回的文字或值的表达式，这些表达式在表达式末尾被丢弃。
+
+    *左值引用类型:
+        *引用本质上与被引用的对象相同
+
+        *与常量非常相似，所有引用都必须初始化。
+
+        *一旦初始化，C++ 中的引用就无法重新定位，这意味着无法将其更改为引用另一个对象
+
+        *引用不是对象,
+            因为引用不是对象，所以不能在需要对象的任何地方使用它们（例如，您不能拥有对引用的引用，因为左值引用必须引用可识别的对象）
+        
+        *绑定到临时对象的常量引用延长了临时对象的生命周期
+            eg:
+                #include <iostream>
+                int main()
+                {
+                    const int& ref { 5 }; // The temporary object holding value 5 has its lifetime extended to match ref
+
+                    std::cout << ref << '\n'; // Therefore, we can safely use it here
+
+                    return 0;
+                } // Both ref and the temporary object die here
+            
+        *左值引用不能绑定到不可修改的左值或右值（否则您可以通过引用更改这些值)
+            因此，左值引用有时也称为非常量左值引用（有时简称为非常量引用）
+            eg:
+                int main()
+                {
+                    int x { 5 };
+                    int& ref { x }; // valid: lvalue reference bound to a modifiable lvalue
+
+                    const int y { 5 };
+                    int& invalidRef { y };  // invalid: can't bind to a non-modifiable lvalue
+                    int& invalidRef2 { 0 }; // invalid: can't bind to an rvalue
+
+                    return 0;
+                }            
+
+        *从编译器的角度来看，& 符号是“附加”到类型名称 (int& ref) 还是变量名称 (int &ref) 并不重要，您选择哪个只是风格问题
+            Best practice:
+                定义引用时，请将“&”号放在类型旁边
+
+    *Constexpr 左值引用:
+         Constexpr 引用有一个特定的限制：它们只能绑定到具有静态持续时间的对象（全局或静态局部）。这是因为编译器知道静态对象将在内存中实例化，因此它可以将该地址视为编译时常量
+            eg：
+                int g_x { 5 };
+                int main()
+                {
+                    [[maybe_unused]] constexpr int& ref1 { g_x }; // ok, can bind to global
+
+                    static int s_x { 6 };
+                    [[maybe_unused]] constexpr int& ref2 { s_x }; // ok, can bind to static local
+
+                    int x { 6 };
+                    [[maybe_unused]] constexpr int& ref3 { x }; // compile error: can't bind to non-static object
+
+                    return 0;
+                }
+
+        当定义对 const 变量的 constexpr 引用时，我们需要同时应用 constexpr（适用于引用）和 const（适用于被引用的类型）。
+            eg:
+                int main()
+                {
+                    static const int s_x { 6 }; // a const int
+                    [[maybe_unused]] constexpr const int& ref2 { s_x }; // needs both constexpr and const
+
+                    return 0;
+                }
+
+
+    
+
+    Key insight:
+        *左值表达式计算结果为可识别对象
+        *右值表达式计算结果为一个值
