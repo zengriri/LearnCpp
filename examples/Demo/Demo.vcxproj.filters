@@ -29,5 +29,8 @@
     <ClInclude Include="add.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Fraction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

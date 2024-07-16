@@ -72,8 +72,109 @@ lvalues and rvalues(左值与右值):
                 }
 
 
-    
+Enumerations：
+        *枚举（也称为枚举类型或枚举）是一种复合数据类型，其值仅限于一组命名符号常量（称为枚举数）。
+
+        *C++ 支持两种枚举：无作用域枚举 和 有作用域枚举
+
+        *枚举数是隐式 constexpr
+
+        *枚举类型是不同的类型,这意味着编译器可以将其与其他类型区分开来
+
+        *枚举大小和基础类型:
+            枚举数具有整数类型的值,C++ 标准没有指定应将哪种特定整型类型用作基础类型，因此选择是实现定义的。
+                可以显式指定枚举的基础类型。
+                    eg:
+                        enum Color : std::int8_t
+                        {
+
+                        }
+        
+    无作用域枚举:
+            *通过 enum 关键字定义   
+                eg:15.1
+            *无作用域枚举之所以如此命名，是因为它们将枚举器名称放入与枚举定义本身相同的作用域中,最好将枚举放在命名范围区域（例如命名空间或类）中，这样枚举器就不会污染全局命名空间
+                eg:15.2
+
+
+    作用域枚举:
+        *作用域枚举的工作方式与无作用域枚举类似
+            但有两个主要区别：
+                    1:它们不会隐式转换为整数
+                    2:枚举数仅放置在枚举的范围区域中（而不是放置在定义枚举的范围区域中）。
+                        eg:15.3
+
+        *using enum statements :
+            C++20 中引入的 using enum 语句将所有枚举器从枚举导入到当前作用域中。当与枚举类类型一起使用时，这允许我们访问枚举类枚举器，而不必在每个枚举器前面加上枚举类的名称前缀
+                eg：15.4
+
+
+        *note:
+            *尽管作用域枚举使用 class 关键字，但它们不被视为“类类型”（为结构、类和联合保留）
+                enum struct 也可以在这种情况下工作，并且行为与枚举类相同。但是，使用 enum struct 并不符合惯用用法，因此请避免使用它
+
+            *与无作用域枚举不同，无作用域枚举将其枚举器放置在与枚举本身相同的作用域中，有作用域枚举仅将其枚举器放置在枚举的作用域区域中。
+                换句话说，作用域枚举就像其枚举器的命名空间。这种内置命名空间有助于减少全局命名空间污染以及在全局作用域中使用作用域枚举时发生名称冲突的可能性。
+                要访问作用域枚举器，我们这样做就像它位于与作用域枚举同名的命名空间中一样：
+                
+
+        *Best practice：
+            优先使用作用域枚举而不是无作用域枚举，除非有令人信服的理由不这样做。
+
+
 
     Key insight:
         *左值表达式计算结果为可识别对象
         *右值表达式计算结果为一个值
+
+
+
+
+    Type	            Meaning	                                                                    Examples
+
+    Fundamental	        A type built into the core C++ language	                                    int, std::nullptr_t
+
+    Compound	        A type built from fundamental types	                                        int&, double*, std::string, Fraction
+
+    User-defined	    A class type or enumerated type
+                        (Includes those defined in the standard library or implementation)
+                        (In casual use, typically used to mean program-defined types)	            std::string, Fraction
+
+    Program-defined	    A class type or enumerated type
+                        (Excludes those defined in standard library or implementation)         
+
+
+struct:
+    *initializers:
+        *结构中的每个成员都按照声明的顺序进行初始化，
+            如果聚合已初始化，但初始化值的数量少于成员的数量，则所有剩余成员都将使用空的初始值设定项列表进行初始化
+
+                eg：15.5，15.6
+        
+        *Default member initialization
+            当我们定义结构（或类）类型时，我们可以为每个成员提供默认初始化值作为类型定义的一部分。
+                eg:15.7
+
+            note:显式初始化值优先于默认值
+
+        *initialization possibilities
+            *如果使用初始化列表定
+                1:如果存在显式初始化值，则使用该显式值
+                2:如果缺少初始值设定项并且存在默认成员初始值设定项，则使用默认值。
+                3:如果缺少初始值设定项且不存在默认成员初始值设定项，则会发生值初始化。
+
+            *如果未使用初始化列表定
+                1：如果存在默认成员初始值设定项，则使用默认值。
+                2：如果不存在默认成员初始值设定项，则该成员保持未初始化状态。
+
+            eg: 15.8
+
+            *note:
+                为了避免出现未初始化成员的可能性，只需确保每个成员都有一个默认值（显式默认值或一对空大括号）,这样，无论我们是否提供初始化列表，我们的成员都将被初始化为某个值。
+
+
+    *Const structs:
+        结构类型的变量可以是 const （或 constexpr），并且就像所有 const 变量一样，它们必须被初始化
+
+    
+  
