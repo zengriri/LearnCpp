@@ -1,0 +1,49 @@
+类与结构的区别：
+    1：strcut的成员默认是public,而class的成员默认是private
+
+    2:由于struct成员默认是 public,故 {} 初始化可以按成员定义的顺序进行初始化，而class默认是private,所有不能像直接使用 {} 初始化，一般使用construc来初始化成员 
+        eg1:
+            class Foo // Foo is not an aggregate (has private members)
+            {
+                int m_x {};
+                int m_y {};
+            };
+
+            int main()
+            {
+                Foo foo { 6, 7 }; // compile error: can not use aggregate initialization
+
+                return 0;
+            }
+
+        eg2:
+             #include <iostream>
+            class Foo
+            {
+            private:
+                int m_x {};
+                int m_y {};
+
+            public:
+                Foo(int x, int y) // here's our constructor function that takes two initializers
+                {
+                    std::cout << "Foo(" << x << ", " << y << ") constructed\n";
+                }
+
+                void print() const
+                {
+                    std::cout << "Foo(" << m_x << ", " << m_y << ")\n";
+                }
+            };
+
+            int main()
+            {
+                Foo foo{ 6, 7 }; // calls Foo(int, int) constructor
+                foo.print();
+
+                return 0;
+            }
+
+
+
+

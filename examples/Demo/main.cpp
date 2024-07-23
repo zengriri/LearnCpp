@@ -1,31 +1,33 @@
 #include <iostream>
+#include <string>
+#include <string_view>
 
-template <typename T>
-struct Pair
+class Employee
 {
-    T first{};
-    T second{};
+private:
+	std::string m_name{};
+
+public:
+	Employee(std::string_view name) : m_name{ name } {}
+	const std::string& getName() const & { return m_name; } //  getter returns by const reference
+	const std::string getName() const=delete //  getter returns by const reference
 };
 
-// Here's our alias template
-// Alias templates must be defined in global scope
-template <typename T>
-using Coord = Pair<T>; // Coord is an alias for Pair<T>
-
-// Our print function template needs to know that Coord's template parameter T is a type template parameter
-template <typename T>
-void print(const Coord<T>& c)
+// createEmployee() returns an Employee by value (which means the returned value is an rvalue)
+Employee createEmployee(std::string_view name)
 {
-    std::cout << c.first << ' ' << c.second << '\n';
+	Employee e{ name };
+	return e;
 }
 
 int main()
 {
-    Coord<int> p1{ 1, 2 }; // Pre C++-20: We must explicitly specify all type template argument
-    Coord p2{ 1, 2 };      // In C++20, we can use alias template deduction to deduce the template arguments in cases where CTAD works
+	// Case 1: okay: use returned reference to member of rvalue class object in same expression
+	std::cout << createEmployee("Frank").getName() << '\n';
 
-    std::cout << p1.first << ' ' << p1.second << '\n';
-    print(p2);
+	// Case 2: bad: save returned reference to member of rvalue class object for use later
+	const std::string& ref{ createEmployee("Garbo").getName() }; // reference becomes dangling when return value of createEmployee() is destroyed
+	std::cout << ref << '\n'; // undefined behavior
 
-    return 0;
+	return 0;
 }
