@@ -5,8 +5,36 @@ Sequence Containers:
     *从 C++11 开始，STL 包含 6 个序列容器：std::vector、std::deque、std::array、std::list、std::forward_list 和 std::basic_string
 
         vector:
-            一个动态数组，能够根据需要增长以包含其元素。vector 类允许通过操作符 [] 随机访问其元素，并且从 vector 末尾插入和删除元素通常很快。
-                eg:1-1
+            *一个动态数组，能够根据需要增长以包含其元素。vector 类允许通过操作符 [] 随机访问其元素，并且从 vector 末尾插入和删除元素通常很快。
+
+            *Constructing a std::vector of a specific length:
+                eg:
+                    std::vector<int> data( 10 ); // vector containing 10 int elements, value-initialized to 0
+                    std::vector<int> data{ 10 }; //the list constructor to construct a vector of length 1 with value 10.
+
+            *Passing std::vector:
+                std::vector 类型的对象可以像任何其他对象一样传递给函数。这意味着如果我们按值传递 std::vector，将会生成一个昂贵的副本。
+                    因此，我们通常通过（const）引用传递 std::vector 以避免此类复制。
+
+                eg:
+                    #include <iostream>
+                    #include <vector>
+
+                    void passByRef(const std::vector<int>& arr) // we must explicitly specify <int> here
+                    {
+                        std::cout << arr[0] << '\n';
+                    }
+
+                    int main()
+                    {
+                        std::vector primes{ 2, 3, 5, 7, 11 };
+                        passByRef(primes);
+
+                        return 0;
+                    }
+                  
+
+        eg:1-1
 
         deque:
             deque 类（读作“deck”）是一个双端队列类，实现为一个可以从两端增长的动态数组

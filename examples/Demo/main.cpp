@@ -1,33 +1,27 @@
 #include <iostream>
-#include <string>
-#include <string_view>
+#include <type_traits> // for std::is_integral and std::is_enum
+#include <vector>
 
-class Employee
+using Index = std::ptrdiff_t;
+
+// Helper function to convert `value` into an object of type std::size_t
+// UZ is the suffix for literals of type std::size_t.
+template <typename T>
+constexpr std::size_t toUZ(T value)
 {
-private:
-	std::string m_name{};
+    // make sure T is an integral type
+    static_assert(std::is_integral<T>() || std::is_enum<T>());
 
-public:
-	Employee(std::string_view name) : m_name{ name } {}
-	const std::string& getName() const & { return m_name; } //  getter returns by const reference
-	const std::string getName() const=delete //  getter returns by const reference
-};
-
-// createEmployee() returns an Employee by value (which means the returned value is an rvalue)
-Employee createEmployee(std::string_view name)
-{
-	Employee e{ name };
-	return e;
+    return static_cast<std::size_t>(value);
 }
 
 int main()
 {
-	// Case 1: okay: use returned reference to member of rvalue class object in same expression
-	std::cout << createEmployee("Frank").getName() << '\n';
+    std::vector arr{ 9, 7, 5, 3, 1 };
 
-	// Case 2: bad: save returned reference to member of rvalue class object for use later
-	const std::string& ref{ createEmployee("Garbo").getName() }; // reference becomes dangling when return value of createEmployee() is destroyed
-	std::cout << ref << '\n'; // undefined behavior
+    auto length{ static_cast<Index>(arr.size()) };  // in C++20, prefer std::ssize()
+    for (auto index{ length - 1 }; index >= 0; --index)
+        std::cout << arr[toUZ(index)] << ' '; // use toUZ() to avoid sign conversion warning
 
-	return 0;
+    return 0;
 }
