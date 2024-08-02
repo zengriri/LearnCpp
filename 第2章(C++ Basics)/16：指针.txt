@@ -1,0 +1,73 @@
+
+*pointer arithmetic：
+    *指针算术是一项功能，允许我们对指针应用某些整数算术运算符（加法、减法、递增或递减）以生成新的内存地址。
+        *给定一些指针 ptr，ptr + 1 返回内存中下一个对象的地址（基于所指向的类型）。
+            因此，如果 ptr 是 int*，并且 int 是 4 个字节，则 ptr + 1 将返回 ptr 之后 4 个字节的内存地址，而 ptr + 2 将返回 ptr 之后 8 个字节的内存地址。
+
+        *对指针应用递增 (++) 和递减 (--) 运算符分别与指针加法和指针减法执行相同的操作，但实际上修改了指针所保存的地址。
+
+    *下标是通过指针算术实现的
+        eg:16.1
+
+    *指针算术和下标都是相对地址:
+        请记住，给定一些指针 ptr，*(ptr + 1) 和 ptr[1] 都会返回内存中的下一个对象（基于所指向的类型）。接下来是一个相对术语，而不是绝对术语
+            eg：16.2
+
+        Best practice：
+            1：从数组开头（元素 0）开始索引时优先使用下标，以便数组索引与元素对齐。
+            2：从给定元素进行相对定位时，优先使用指针算术。
+
+    *可以使用指针运算来遍历数组
+        指针算术最常见的用途之一是在没有显式索引的情况下迭代 C 样式数组。
+            eg:16.3
+
+
+*C-style的string,array
+
+    *C-style的字符串也是数组，所以，两者作为参数传递，都会衰变成指针
+        eg：
+            char[]------>char*
+
+    *C-style的指针将输出内容而不是地址，原因是输出流（例如 std::cout）对您的意图做出一些假设。
+        因此，如果你向它传递一个非字符指针，它只会打印该指针的内容（指针所持有的地址）。但是，如果您向其传递 char* 或 const char* 类型的对象，它会假设您打算打印字符串。
+            eg:
+                #include <iostream>
+                int main()
+                {
+                    int narr[]{ 9, 7, 5, 3, 1 };
+                    char carr[]{ "Hello!" };
+                    const char* ptr{ "Alex" };
+
+                    std::cout << narr << '\n'; // narr will decay to type int*          out:003AF738
+                    std::cout << carr << '\n'; // carr will decay to type char*         out:Hello!
+                    std::cout << ptr << '\n'; // name is already type char*             out:Alex
+
+                    return 0;
+                }
+
+            eg: 在本例中，程序员打算打印变量 c 的地址。然而， &c 具有 char* 类型，因此 std::cout 尝试将其打印为字符串！而且因为 c 不是以 null 终止的，所以我们会得到未定义的行为。
+                #include <iostream>
+                int main()
+                {
+                    char c{ 'Q' };
+                    std::cout << &c;
+                    return 0;
+                }               
+
+            *如果您确实想打印 char 指针的地址，请将其 static_cast 为 const void* 类型：
+                eg:
+                    #include <iostream>
+                    int main()
+                    {
+                        const char* ptr{ "Alex" };
+
+                        std::cout << ptr << '\n';                           // print ptr as C-style string
+                        std::cout << static_cast<const void*>(ptr) << '\n'; // print address held by ptr
+
+                        return 0;
+                    }
+
+    *对于 C 风格字符串符号常量，支持 std::string_view
+            
+
+

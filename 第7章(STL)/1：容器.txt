@@ -1,9 +1,27 @@
 Sequence Containers:
     *序列容器是维护容器中元素顺序的容器类。序列容器的一个定义特征是您可以按位置选择插入元素的位置。
         序列容器最常见的例子是数组：如果你在一个数组中插入四个元素，这些元素将按照你插入它们的确切顺序。
+
+    *数组:
+        *C++ 具有三种常用的不同数组类型：std::vector、std::array 和 C 样式数组。
+
+        *Fixed-size arrays:
+            固定大小数组（也称为固定长度数组）要求在实例化时已知数组的长度，并且此后不能更改该长度。 C 风格数组和 std::array 都是固定大小的数组。
+            eg:
+                std::array<int, 6> fibonnaci = { 0, 1, 1, 2, 3, 5 };
+                constexpr std::array a1{ 9, 7, 5, 3, 1 }; // The type is deduced to std::array<int, 5> c++17
+                  constexpr auto myArray1 { std::to_array<int, 5>({ 9, 7, 5, 3, 1 }) }; //使用 std::to_array 省略数组长度  c++20
+
+        *Dynamic arrays :
+            动态数组可以在运行时调整大小。 std::vector 是一个动态数组。
+
+        *Best practice:
+            *对于 constexpr 数组使用 std::array，对于非 constexpr 数组使用 std::vector。
+            *使用类模板参数推导 (CTAD) 使编译器从 std::array 的初始值设定项中推导 std::array 的类型和长度。
+            *需要 C 风格数组类型的函数参数应使用数组语法（例如 int arr[]）而不是指针语法（例如 int *arr）。
+
         
     *从 C++11 开始，STL 包含 6 个序列容器：std::vector、std::deque、std::array、std::list、std::forward_list 和 std::basic_string
-
         vector:
             *一个动态数组，能够根据需要增长以包含其元素。vector 类允许通过操作符 [] 随机访问其元素，并且从 vector 末尾插入和删除元素通常很快。
 
@@ -39,6 +57,28 @@ Sequence Containers:
         deque:
             deque 类（读作“deck”）是一个双端队列类，实现为一个可以从两端增长的动态数组
                 eg:1-2
+
+        *基于范围的 for 循环 (for-each):
+            *遍历容器时，优先使用基于范围的 for 循环，而不是常规的 for 循环。
+                将类型推导 (auto) 与基于范围的 for 循环结合使用，让编译器推导数组元素的类型。
+            
+            *避免使用引用进行元素复制
+                eg:
+                     for (const auto& word : words) // word is now a const reference
+                        std::cout << word << ' ';
+
+            *When to use auto vs auto& vs const auto&
+                通常我们会使用 auto 来表示复制成本低的类型，当我们想要修改元素时使用 auto& ，使用 const auto& 表示复制成本较高的类型。
+                    但对于基于范围的 for 循环，许多开发人员认为最好始终使用 const auto&，因为它更面向未来。
+
+            *基于范围的 for 循环和其他标准容器类型：
+                基于范围的 for 循环适用于各种数组类型，包括（non-decayed）C 样式数组、std::array、std::vector、 linked list、tree和maps。
+
+            Best practice:
+                对于基于范围的 for 循环，最好将元素类型定义为：
+                    .auto:          当您想要修改元素的副本时。
+                    .auto&:         当你想修改原来的元素时。
+                    .const auto&    当您只需要查看原始元素时。
 
 
 Associative Containers:
