@@ -2,14 +2,14 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++ Build",
-            "command": "D:\\Program Files\\msys64\\mingw64\\bin\\g++.exe",
+            "label": "CppBuild",
+            "command": "D:\\Program Files\\msys64\\ucrt64\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${workspaceFolder}/*.cpp",
+                "${workspaceFolder}/**/*.cpp",
                 "-o",
-                "${workspaceFolder}\\template.exe"
+                "${workspaceFolder}\\demo.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"

@@ -24,14 +24,17 @@ Initialization：
         int d { 7 }; // initializer in braces
 
     共有4种初始化方法：
-        Default initialization：
-            没有提供初始值。在大多数情况下，默认初始化会留下一个具有不确定值的变量 eg:int a;
+        Default initialization： 
+            没有提供初始值。在大多数情况下，默认初始化会留下一个具有不确定值的变量
+                eg:int a;
         
         Copy initialization:
-            当等号后提供初始化器时，这称为复制初始化。复制初始化继承自 C 语言     eg：int width = 5; // copy initialization of value 5 into variable width
+            当等号后提供初始化器时，这称为复制初始化。复制初始化继承自 C 语言(注:它会调用拷贝构造函数或隐式转换函数) 
+                eg：int width = 5; // copy initialization of value 5 into variable width
 
         Direct Initialization：
-            当括号内提供初始化器时，这称为直接初始化。                          eg: int width( 5 ); // direct initialization of value 5 into variable width
+            当括号内提供初始化器时，这称为直接初始化。(注：在类类型对象上，直接初始化会直接调用构造函数，而不是先拷贝再赋值。)                          
+                eg: int width( 5 ); // direct initialization of value 5 into variable width
             
             注：对于简单的数据类型（如 int），复制和直接初始化本质上是一样的。对于更复杂的类型，直接初始化往往比复制初始化更有效
 

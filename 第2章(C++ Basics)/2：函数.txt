@@ -108,7 +108,8 @@
                 如果您有一个函数由于某种原因（例如性能）必须在编译时运行，请使用 consteval。
 
     匿名函数:
-        lambda 表达式（也称为 lambda 或闭包）允许我们在另一个函数中定义一个匿名函数。嵌套很重要，因为它让我们既可以避免命名空间命名污染，又可以将函数定义为尽可能靠近使用它的位置（提供额外的上下文）
+        lambda 表达式（也称为 lambda 或闭包）允许我们在另一个函数中定义一个匿名函数。
+            嵌套很重要，因为它让我们既可以避免命名空间命名污染，又可以将函数定义为尽可能靠近使用它的位置（提供额外的上下文）
              *lambda 的这种用法有时被称为函数字面量。
 
         语法格式
@@ -119,6 +120,7 @@
 
             注:
                *如果不需要，捕获子句和参数都可以为空。
+                    eg:[]{}
                *返回类型是可选的，如果省略，将假定为 auto（因此使用类型推断来确定返回类型）。
                     eg：2-1
 
@@ -126,17 +128,17 @@
         类型：
             *就像我们可以用字面值（或函数指针）初始化一个变量以供以后使用一样，我们也可以用 lambda 定义初始化一个 lambda 变量，然后再使用它
                 一个命名的 lambda 和一个好的函数名可以使代码更容易阅读。
-            eg:
-                return std::all_of(array.begin(), array.end(), [](int i){ return ((i % 2) == 0); });
-                替换为：
-                        auto isEven{
-                        [](int i)
-                        {
-                            return ((i % 2) == 0);
-                        }
-                        };
+                eg:
+                    return std::all_of(array.begin(), array.end(), [](int i){ return ((i % 2) == 0); });
+                    替换为：
+                            auto isEven{
+                            [](int i)
+                            {
+                                return ((i % 2) == 0);
+                            }
+                            };
 
-                        return std::all_of(array.begin(), array.end(), isEven);
+                            return std::all_of(array.begin(), array.end(), isEven);
 
             lambda isEven 的类型是什么？
                 *事实证明，lambda 没有我们可以显式使用的类型。当我们编写一个 lambda 时，编译器会为未暴露给我们的 lambda 生成一个唯一类型
@@ -153,7 +155,6 @@
 
                 *使用 lambda 的实际类型的唯一方法是通过 auto。与 std::function 相比， auto 还具有没有开销的好处
                 *使用 lambda 初始化变量时使用 auto，如果无法使用 lambda 初始化变量，则使用 std::function。
-
                     eg:2-2
 
         Generic lambdas:
@@ -165,9 +166,15 @@
             需要注意的一件事是，将为自动解析到的每种不同类型生成一个唯一的 lambda
                 eg:2-4
 
+        Constexpr lambdas:
+            从 C++17 开始，如果结果满足常量表达式的要求，则 lambda 隐式为 constexpr。这通常需要两件事：
+                1:lambda 必须没有捕获，或者所有捕获都必须是 constexpr。
+                2:lambda 调用的函数必须是 constexpr。请注意，许多标准库算法和数学函数直到 C++20 或 C++23 才被制作为 constexpr。
+
         
         Lambda 捕获:
-            *lambda 只能访问特定类型的标识符：全局标识符、编译时已知的实体以及具有静态存储持续时间的实体。capture 子句用于（间接）让 lambda 访问它通常无法访问的周围范围内可用的变量
+            *lambda 只能访问特定类型的标识符：全局标识符、编译时已知的实体以及具有静态存储持续时间的实体。
+                capture 子句用于（间接）让 lambda 访问它通常无法访问的周围范围内可用的变量
 
             *当执行 lambda 定义时，对于 lambda 捕获的每个变量，都会在 lambda 中创建该变量的克隆（具有相同的名称）。这些克隆的变量此时从同名的外部范围变量初始化。
                 注：

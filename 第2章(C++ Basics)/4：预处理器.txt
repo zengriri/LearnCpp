@@ -14,7 +14,7 @@
 
     Includes:
         替换作用
-        eg: #include <iostream>) 直接在该位置替换成iostream文件种的全部内容
+        eg: #include <iostream> 直接在该位置替换成iostream文件种的全部内容
 
     Macro defines：（2种宏:对象宏和函数宏）
         #define 指令可用于创建宏。在 C++ 中，宏是定义如何将输入文本转换为替换输出文本的规则
