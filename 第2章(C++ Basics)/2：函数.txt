@@ -1,3 +1,203 @@
+函数基础知识和概念:
+
+    函数的定义和组成:
+        函数是一段可重复使用的代码块，用于执行特定任务。
+        
+        函数的基本组成部分：
+            1. 返回类型 (Return Type)
+            2. 函数名 (Function Name)  
+            3. 参数列表 (Parameter List)
+            4. 函数体 (Function Body)
+            
+        语法格式:
+            return_type function_name(parameter_list)
+            {
+                // 函数体
+                return value; // 可选，取决于返回类型
+            }
+
+        示例:
+            int add(int a, int b)     // 返回类型: int, 函数名: add, 参数: int a, int b
+            {
+                return a + b;         // 函数体和返回语句
+            }
+
+    函数调用机制:
+        1. 调用栈 (Call Stack):
+            - 每次函数调用都会在栈上创建一个新的栈帧
+            - 栈帧包含参数、局部变量、返回地址等信息
+            - 函数返回时，栈帧被销毁
+            
+        2. 参数传递方式:
+            - 按值传递 (Pass by Value): 复制参数值
+            - 按引用传递 (Pass by Reference): 传递变量的引用
+            - 按指针传递 (Pass by Pointer): 传递变量的地址
+
+        示例:
+            void byValue(int x) { x = 10; }           // 不会改变原变量
+            void byReference(int& x) { x = 10; }      // 会改变原变量
+            void byPointer(int* x) { *x = 10; }       // 会改变原变量
+
+    函数的作用域和生命周期:
+        1. 局部变量: 在函数内部定义，函数结束时销毁
+        2. 静态局部变量: 在函数内部定义，程序结束时销毁
+        3. 全局变量: 在函数外部定义，程序结束时销毁
+
+        示例:
+            int globalVar = 100;  // 全局变量
+
+            void example() {
+                int localVar = 10;        // 局部变量
+                static int staticVar = 20; // 静态局部变量
+                
+                localVar++;    // 每次调用都重新初始化
+                staticVar++;   // 保持上次的值
+            }
+
+    递归函数:
+        函数调用自身的技术，必须有终止条件避免无限递归。
+
+        递归的组成要素:
+            1. 基础情况 (Base Case): 递归终止条件
+            2. 递归情况 (Recursive Case): 函数调用自身
+
+        示例:
+            // 计算阶乘
+            int factorial(int n) {
+                if (n <= 1) return 1;        // 基础情况
+                return n * factorial(n - 1); // 递归情况
+            }
+
+            // 斐波那契数列
+            int fibonacci(int n) {
+                if (n <= 1) return n;
+                return fibonacci(n-1) + fibonacci(n-2);
+            }
+
+        递归优化技巧:
+            1. 尾递归优化
+            2. 记忆化 (Memoization)
+            3. 动态规划替代
+
+    函数指针:
+        指向函数的指针，可以用来实现回调函数、函数表等高级功能。
+
+        语法:
+            return_type (*pointer_name)(parameter_list);
+
+        示例:
+            int add(int a, int b) { return a + b; }
+            int multiply(int a, int b) { return a * b; }
+
+            int main() {
+                int (*operation)(int, int);  // 声明函数指针
+                
+                operation = add;             // 指向add函数
+                int result1 = operation(5, 3); // 调用add
+                
+                operation = multiply;        // 指向multiply函数
+                int result2 = operation(5, 3); // 调用multiply
+                
+                return 0;
+            }
+
+    函数对象和仿函数 (Functors):
+        重载了operator()的类对象，可以像函数一样调用。
+
+        示例:
+            class Adder {
+            private:
+                int value;
+            public:
+                Adder(int v) : value(v) {}
+                int operator()(int x) const {
+                    return x + value;
+                }
+            };
+
+            int main() {
+                Adder add5(5);          // 创建函数对象
+                int result = add5(10);  // 调用operator()，结果为15
+                return 0;
+            }
+
+    std::function (C++11):
+        通用的函数包装器，可以存储、复制和调用任何可调用对象。
+
+        示例:
+            #include <functional>
+            #include <iostream>
+
+            void normalFunction(int x) {
+                std::cout << "Normal function: " << x << std::endl;
+            }
+
+            int main() {
+                std::function<void(int)> f;
+                
+                // 存储普通函数
+                f = normalFunction;
+                f(10);
+                
+                // 存储lambda表达式
+                f = [](int x) { std::cout << "Lambda: " << x << std::endl; };
+                f(20);
+                
+                // 存储函数对象
+                f = Adder(5);
+                // f(30); // 这里需要适配，因为Adder返回int而不是void
+                
+                return 0;
+            }
+
+    异常处理与函数:
+        函数可以抛出和处理异常，提供错误处理机制。
+
+        基本语法:
+            void riskyFunction() {
+                if (/* 错误条件 */) {
+                    throw std::runtime_error("Something went wrong");
+                }
+            }
+
+            int main() {
+                try {
+                    riskyFunction();
+                } catch (const std::exception& e) {
+                    std::cout << "Caught exception: " << e.what() << std::endl;
+                }
+                return 0;
+            }
+
+        异常安全保证:
+            1. 基本保证: 不会造成资源泄漏
+            2. 强异常安全保证: 要么完全成功，要么状态不变
+            3. 无异常保证: 永远不会抛出异常
+
+    函数性能优化:
+        1. 内联函数: 减少函数调用开销
+        2. 引用传递: 避免大对象的复制
+        3. const正确性: 允许编译器优化
+        4. 移动语义: 减少不必要的复制
+        5. 完美转发: 保持参数的值类别
+
+        示例:
+            // 高效的参数传递
+            void processLargeObject(const LargeObject& obj);    // 只读，用const引用
+            void modifyLargeObject(LargeObject& obj);           // 修改，用引用
+            void takeLargeObject(LargeObject obj);              // 需要副本，按值传递
+            void moveLargeObject(LargeObject&& obj);            // 移动，用右值引用
+
+    最佳实践总结:
+        1. 使用有意义的函数名
+        2. 保持函数简短和专一职责
+        3. 优先使用const引用传递大对象
+        4. 避免过深的嵌套和过长的参数列表
+        5. 使用异常处理而不是错误码
+        6. 合理使用内联函数
+        7. 注意函数的线程安全性
+        8. 使用RAII管理资源
+
 声明和定义
     *声明是一个标识符，而定义就像是实例化一个对象，eg ing a=5; a是一个标识符，他表示一个int类型，值为5的对象。
 
@@ -60,6 +260,68 @@
             2:Constexpr / consteval 函数
             3:从函数模板隐式实例化的函数
 
+        *C++隐式内联的详细情况：
+
+            1. 类内定义的成员函数（包括构造函数、析构函数）
+                class MyClass {
+                public:
+                    void func() { /* 隐式内联 */ }
+                    MyClass() { /* 构造函数隐式内联 */ }
+                    ~MyClass() { /* 析构函数隐式内联 */ }
+                    int getValue() const { return value; } // getter函数隐式内联
+                private:
+                    int value = 10; // 类内初始化器隐式内联
+                };
+
+            2. constexpr函数
+                constexpr int square(int x) { return x * x; } // 隐式内联
+
+            3. consteval函数（C++20）
+                consteval int compute(int x) { return x * 2; } // 隐式内联
+
+            4. 函数模板
+                template<typename T>
+                T add(T a, T b) { return a + b; } // 模板函数隐式内联
+
+            5. 类模板的成员函数
+                template<typename T>
+                class Container {
+                public:
+                    void push(const T& item) { /* 隐式内联 */ }
+                };
+
+            6. Lambda表达式
+                auto lambda = [](int x) { return x * 2; }; // 隐式内联
+
+            7. 结构体内定义的函数
+                struct Point {
+                    void move(int dx, int dy) { x += dx; y += dy; } // 隐式内联
+                    int x, y;
+                };
+
+            8. 联合体内定义的函数
+                union Data {
+                    void setValue(int val) { intVal = val; } // 隐式内联
+                    int intVal;
+                    float floatVal;
+                };
+
+            9. 变量模板（C++14）
+                template<typename T>
+                constexpr T pi = T(3.1415926535897932385); // 隐式内联
+
+            10. 类的静态成员变量（C++17内联变量）
+                class Config {
+                public:
+                    static inline int maxSize = 100; // 隐式内联
+                };
+
+        *需要注意的点：
+            - 隐式内联并不意味着编译器一定会进行内联优化
+            - 编译器可能会忽略隐式内联提示，根据自己的判断决定是否内联
+            - 过度内联可能导致代码膨胀和性能下降
+            - 在头文件中定义的内联函数必须在所有翻译单元中保持相同的定义
+
         *为什么不将所有函数内联并定义在头文件中？
             1:它会增加编译时间。当代码文件中的函数发生更改时，只需要重新编译该代码文件。
                 当头文件中的内联函数发生变化时，包含该头文件的每个代码文件(直接或通过另一个头文件)都需要重新编译。在大型项目中，这可能会产生巨大的影响
@@ -107,10 +369,24 @@
             note:
                 如果您有一个函数由于某种原因（例如性能）必须在编译时运行，请使用 consteval。
 
-    匿名函数:
+    匿名函数 (Lambda表达式):
         lambda 表达式（也称为 lambda 或闭包）允许我们在另一个函数中定义一个匿名函数。
             嵌套很重要，因为它让我们既可以避免命名空间命名污染，又可以将函数定义为尽可能靠近使用它的位置（提供额外的上下文）
              *lambda 的这种用法有时被称为函数字面量。
+
+        Lambda的优势:
+            1. 就地定义: 在使用点定义函数，提高代码可读性
+            2. 捕获外部变量: 可以访问周围作用域的变量
+            3. 类型推导: 编译器自动推导返回类型
+            4. 函数式编程: 支持函数式编程范式
+            5. STL算法: 与STL算法完美配合
+
+        应用场景:
+            1. STL算法的谓词函数
+            2. 回调函数
+            3. 事件处理
+            4. 函数式编程
+            5. 临时的简单函数
 
         语法格式
             [ captureClause ] ( parameters ) -> returnType
@@ -125,204 +401,153 @@
                     eg：2-1
 
 
-        类型：
-            *就像我们可以用字面值（或函数指针）初始化一个变量以供以后使用一样，我们也可以用 lambda 定义初始化一个 lambda 变量，然后再使用它
-                一个命名的 lambda 和一个好的函数名可以使代码更容易阅读。
-                eg:
-                    return std::all_of(array.begin(), array.end(), [](int i){ return ((i % 2) == 0); });
-                    替换为：
-                            auto isEven{
-                            [](int i)
-                            {
-                                return ((i % 2) == 0);
-                            }
-                            };
+        Lambda的高级特性:
 
-                            return std::all_of(array.begin(), array.end(), isEven);
+            1. 递归Lambda:
+                auto factorial = [](int n) -> int {
+                    std::function<int(int)> fact = [&](int x) -> int {
+                        return x <= 1 ? 1 : x * fact(x - 1);
+                    };
+                    return fact(n);
+                };
 
-            lambda isEven 的类型是什么？
-                *事实证明，lambda 没有我们可以显式使用的类型。当我们编写一个 lambda 时，编译器会为未暴露给我们的 lambda 生成一个唯一类型
+            2. 模板Lambda (C++14):
+                auto genericLambda = [](auto a, auto b) {
+                    return a + b;
+                };
+                // 可以用于不同类型: genericLambda(1, 2), genericLambda(1.5, 2.3)
 
-                *实际上，lambda 不是函数（这是它们如何避免 C++ 不支持嵌套函数的限制的一部分）
+            3. 变参模板Lambda (C++14):
+                auto variadic = [](auto... args) {
+                    return (args + ...); // C++17折叠表达式
+                };
 
-                *它们是一种特殊的对象，称为函子。函子是包含重载 operator() 的对象，使它们像函数一样可调用。
+            4. 完美转发Lambda:
+                auto perfectForwarding = [](auto&& func, auto&&... args) {
+                    return func(std::forward<decltype(args)>(args)...);
+                };
 
+            5. IIFE (立即调用函数表达式):
+                int result = [](int x) { return x * x; }(5); // 立即调用，result = 25
 
-                *虽然我们不知道 lambda 的类型，但有几种存储 lambda 以供后定义使用的方法：
-                    1：指针
-                    2：function
-                    2:auto
-
-                *使用 lambda 的实际类型的唯一方法是通过 auto。与 std::function 相比， auto 还具有没有开销的好处
-                *使用 lambda 初始化变量时使用 auto，如果无法使用 lambda 初始化变量，则使用 std::function。
-                    eg:2-2
-
-        Generic lambdas:
-            *在大多数情况下，lambda 参数的工作规则与常规函数参数相同
-            *当 lambda 具有一个或多个 auto 参数时，编译器将从对 lambda 的调用中推断出需要哪些参数类型。
-                eg2-3
-
-        Generic lambdas and static variables：
-            需要注意的一件事是，将为自动解析到的每种不同类型生成一个唯一的 lambda
-                eg:2-4
-
-        Constexpr lambdas:
-            从 C++17 开始，如果结果满足常量表达式的要求，则 lambda 隐式为 constexpr。这通常需要两件事：
-                1:lambda 必须没有捕获，或者所有捕获都必须是 constexpr。
-                2:lambda 调用的函数必须是 constexpr。请注意，许多标准库算法和数学函数直到 C++20 或 C++23 才被制作为 constexpr。
-
-        
-        Lambda 捕获:
-            *lambda 只能访问特定类型的标识符：全局标识符、编译时已知的实体以及具有静态存储持续时间的实体。
-                capture 子句用于（间接）让 lambda 访问它通常无法访问的周围范围内可用的变量
-
-            *当执行 lambda 定义时，对于 lambda 捕获的每个变量，都会在 lambda 中创建该变量的克隆（具有相同的名称）。这些克隆的变量此时从同名的外部范围变量初始化。
-                注：
-                    捕获的 lambda 变量是外部范围变量的克隆，而不是实际变量。
-                    *当编译器遇到 lambda 定义时，它会为 lambda 创建一个自定义对象定义。每个捕获的变量都成为对象的数据成员。
-                    *在运行时，当遇到 lambda 定义时，将实例化 lambda 对象，并在该点初始化 lambda 的成员
-
-                eg：2-5
-
-
-            *捕获默认为 const 值
-                这意味着当创建 lambda 时，lambda 会捕获外部范围变量的常量副本，这意味着不允许 lambda 修改它们
-
-            Mutable capture by value：
-                *为了允许修改通过值捕获的变量，我们可以将 lambda 标记为可变。在此上下文中的 mutable 关键字删除了 const
-
-                *请注意，ammo 的值会在对 lambda 的调用中保留！
-
-                eg:2-6
-
-
-        Capture by reference
-            *要通过引用捕获变量，我们在捕获中的变量名称前添加一个和号 (&)
-            *与按值捕获的变量不同，按引用捕获的变量是非常量的，除非它们捕获的变量是 const
-            *每当您通常希望通过引用将参数传递给函数时，按引用捕获应该优先于按值捕获
-
-            eg：2-7
-        
-
-        Default captures：
-            默认捕获（也称为默认捕获）捕获 lambda 中提到的所有变量。如果使用默认捕获，则不会捕获 lambda 中未提及的变量
-
-                *要按值捕获所有使用的变量，请使用捕获值 =。
-                *要通过引用捕获所有使用的变量，请使用 & 的捕获值。
-
-                    eg:
-                        int health{ 33 };
-                        int armor{ 100 };
-                        std::vector<CEnemy> enemies{};
-
-                        // Capture health and armor by value, and enemies by reference.
-                        [health, armor, &enemies](){};
-
-                        // Capture enemies by reference and everything else by value.
-                        [=, &enemies](){};
-
-                        // Capture armor by value and everything else by reference.
-                        [&, armor](){};
-
-                        // Illegal, we already said we want to capture everything by reference.
-                        [&, &armor](){};
-
-                        // Illegal, we already said we want to capture everything by value.
-                        [=, armor](){};
-
-                        // Illegal, armor appears twice.
-                        [armor, &health, &armor](){};
-
-                        // Illegal, the default capture has to be the first element in the capture group.
-                        [armor, &](){};
-
-        注：
-            通过引用捕获变量时要格外小心，尤其是使用默认引用捕获。捕获的变量必须比 lambda 寿命更长
-    
-        可变 lambda 的意外副本:
-
-            eg：
-                #include <iostream>
-                int main()
-                {
-                int i{ 0 };
-
-                // Create a new lambda named count
-                auto count{ [i]() mutable {
-                    std::cout << ++i << '\n';
-                } };
-
-                count(); // invoke count
-
-                auto otherCount{ count }; // create a copy of count
-
-                // invoke both count and the copy
-                count();
-                otherCount();
-
-                return 0;
-                }
-
-                    Output
-                    1
-                    2
-                    2
-
-                代码不是打印 1、2、3，而是两次打印 2
-                .当我们创建 otherCount 作为 count 的副本时，我们创建了当前状态的 count 副本。 count 的 i 是 1，所以 otherCount 的 i 也是 1。由于 otherCount 是 count 的副本，因此它们每个都有自己的 i
-
-            *幸运的是，C++ 提供了一种方便的类型（作为 <functional> 标头的一部分），称为 std::reference_wrapper，它允许我们像传递引用一样传递普通类型。
-                eg:
-                    #include <iostream>
-                    #include <functional>
-
-                    void invoke(const std::function<void()>& fn)
-                    {
-                        fn();
+            6. 条件编译Lambda:
+                auto conditionalLambda = [](int x) {
+                    if constexpr (sizeof(int) == 4) {
+                        return x * 2;
+                    } else {
+                        return x * 3;
                     }
+                };
 
-                    int main()
-                    {
-                        int i{ 0 };
+        Lambda与STL算法的结合:
+            #include <algorithm>
+            #include <vector>
+            #include <numeric>
 
-                        // Increments and prints its local copy of @i.
-                        auto count{ [i]() mutable {
-                        std::cout << ++i << '\n';
-                        } };
+            std::vector<int> numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-                        // std::ref(count) ensures count is treated like a reference
-                        // thus, anything that tries to copy count will actually copy the reference
-                        // ensuring that only one count exists
-                        invoke(std::ref(count));
-                        invoke(std::ref(count));
-                        invoke(std::ref(count));
+            // 查找满足条件的元素
+            auto it = std::find_if(numbers.begin(), numbers.end(), 
+                                 [](int n) { return n > 5; });
 
-                        return 0;
-                    }
+            // 变换容器元素
+            std::transform(numbers.begin(), numbers.end(), numbers.begin(),
+                          [](int n) { return n * n; });
 
+            // 累积计算
+            auto sum = std::accumulate(numbers.begin(), numbers.end(), 0,
+                                     [](int acc, int n) { return acc + n; });
 
-        Defining new variables in the lambda-capture:  
-            有时我们想要捕获一个稍作修改的变量，或者声明一个仅在 lambda 范围内可见的新变量。我们可以通过在 lambda-capture 中定义一个变量而不指定它的类型来做到这一点
-                eg:2-8
+            // 排序
+            std::sort(numbers.begin(), numbers.end(),
+                     [](int a, int b) { return a > b; }); // 降序
 
-        Unintended copies of mutable lambdas:
-            因为 lambdas 是对象，所以它们可以被复制。在某些情况下，这可能会导致问题
-                eg：2-9，2-10，2-11
+            // 分区
+            std::partition(numbers.begin(), numbers.end(),
+                          [](int n) { return n % 2 == 0; }); // 偶数在前
 
+        Lambda的性能考虑:
+            1. 无捕获的lambda可以转换为函数指针
+            2. 有捕获的lambda会生成函数对象
+            3. 编译器通常会内联简单的lambda
+            4. 避免过度捕获，只捕获需要的变量
+            5. 考虑使用std::function的开销
 
-函数重载:
-    *重载函数如何区分：
+        Lambda最佳实践:
+            1. 保持lambda简短和专一
+            2. 避免复杂的捕获列表
+            3. 使用auto进行类型推导
+            4. 考虑使用泛型lambda增加重用性
+            5. 在需要时明确指定返回类型
+            6. 谨慎使用引用捕获，注意生命周期
+
+        Lambda vs 其他可调用对象比较:
+            特性          | 函数指针 | 函数对象 | std::function | Lambda
+            类型推导      | 否       | 否       | 是           | 是
+            状态存储      | 否       | 是       | 是           | 是(捕获)
+            内联优化      | 有限     | 是       | 有限         | 是
+            运行时开销    | 最小     | 最小     | 较大         | 最小
+            灵活性        | 低       | 中       | 高           | 高
+
+函数重载 (Function Overloading):
+    函数重载允许定义多个同名但参数不同的函数，编译器根据调用时的参数来选择合适的函数版本。
+
+    重载的基本原则:
+        函数重载基于函数签名的不同，函数签名包括：
+            1. 函数名
+            2. 参数的数量
+            3. 参数的类型
+            4. 参数的顺序 (如果类型不同)
+            5. const限定符 (对于成员函数)
+
+    重载函数如何区分：
         包括:
             1：函数参数个数
             2：函数参数类型
+            3：参数顺序 (当类型不同时)
+            4：const限定符 (成员函数)
+            5：引用限定符 (C++11, 成员函数)
+            
         不包括:
-            1:返回类型
+            1：返回类型
             2：对于按值传递的参数，也不考虑 const 限定符。
                 eg:
                     void print(int);
                     void print(const int); // not differentiated from print(int)
+            3：参数名称
+            4：默认参数值
 
-    *解决重载函数调用:当对重载函数进行函数调用时，编译器将逐步执行一系列规则，以确定哪个（如果有）重载函数是最佳匹配
+    重载示例:
+        // 基于参数数量的重载
+        void print(int x);
+        void print(int x, int y);
+        void print(int x, int y, int z);
+
+        // 基于参数类型的重载
+        void process(int value);
+        void process(double value);
+        void process(const std::string& value);
+        void process(char* value);
+
+        // 基于参数顺序的重载
+        void draw(int x, double y);
+        void draw(double x, int y);
+
+        // 基于const限定符的重载 (成员函数)
+        class Container {
+        public:
+            int& at(size_t index);              // 非const版本
+            const int& at(size_t index) const;  // const版本
+        };
+
+        // 基于引用限定符的重载 (C++11)
+        class MyClass {
+        public:
+            void func() &;      // 左值对象调用
+            void func() &&;     // 右值对象调用
+        };
+
+    解决重载函数调用:当对重载函数进行函数调用时，编译器将逐步执行一系列规则，以确定哪个（如果有）重载函数是最佳匹配
         参数匹配序列:
             步骤1: 编译器尝试找到完全匹配。这分两个阶段发生
                 1:首先，编译器将查看是否存在重载函数，其中函数调用中的参数类型与重载函数中的参数类型完全匹配。
@@ -343,35 +568,57 @@
 
             步骤6: 如果此时尚未找到匹配项，编译器将放弃并发出有关无法找到匹配函数的编译错误
 
+    重载解析的陷阱:
+        1. 二义性问题:
+            void func(int x);
+            void func(long x);
+            func(3.14f); // 二义性：float可以转换为int或long
+
+        2. 意外的转换:
+            void func(int x);
+            void func(char x);
+            func(true); // 调用func(int)，bool转换为int
+
+        3. 隐式转换的优先级:
+            void func(double x);
+            void func(int x);
+            func(3.14); // 调用func(double)，精确匹配优于转换
+
+    最佳实践:
+        1. 避免创建可能导致二义性的重载
+        2. 使用强类型和明确的参数类型
+        3. 考虑使用不同的函数名而不是重载
+        4. 文档化重载函数的预期用途
+
 
 delete函数：
     如果我们明确不想调用一个函数，我们可以使用 = delete 说明符将该函数定义为已删除。如果编译器将函数调用与已删除的函数相匹配，则编译将因编译错误而停止。
     
-        eg:
-            #include <iostream>
+    基本用法:
+        #include <iostream>
 
-            void printInt(int x)
-            {
-                std::cout << x << '\n';
-            }
+        void printInt(int x)
+        {
+            std::cout << x << '\n';
+        }
 
-            void printInt(char) = delete; // calls to this function will halt compilation
-            void printInt(bool) = delete; // calls to this function will halt compilation
+        void printInt(char) = delete; // calls to this function will halt compilation
+        void printInt(bool) = delete; // calls to this function will halt compilation
 
-            int main()
-            {
-                printInt(97);   // okay
+        int main()
+        {
+            printInt(97);   // okay
 
-                printInt('a');  // compile error: function deleted
-                printInt(true); // compile error: function deleted
+            printInt('a');  // compile error: function deleted
+            printInt(true); // compile error: function deleted
 
-                printInt(5.0);  // compile error: ambiguous match
+            printInt(5.0);  // compile error: ambiguous match
 
-                return 0;
-            }
+            return 0;
+        }
 
     Key insight:
-        =删除的意思是“我禁止这个”，而不是“这个不存在”。删除的函数参与函数重载决策的所有阶段（不仅仅是精确匹配阶段）。如果选择了已删除的函数，则会出现编译错误
+        =delete的意思是"我禁止这个"，而不是"这个不存在"。删除的函数参与函数重载决策的所有阶段（不仅仅是精确匹配阶段）。如果选择了已删除的函数，则会出现编译错误
 
     删除所有不匹配的重载:删除一堆单独的函数重载效果很好，但可能很冗长。有时我们可能希望仅使用类型与函数参数完全匹配的参数来调用某个函数。我们可以通过使用函数模板来完成此操作
         eg：
@@ -395,43 +642,116 @@ delete函数：
                 return 0;
             }
 
+    删除函数的应用场景:
+        1. 防止不期望的类型转换
+        2. 删除特定的重载版本
+        3. 禁用复制构造函数和赋值运算符
+        4. 防止在特定上下文中使用函数
+
+    示例 - 防止对象复制:
+        class NonCopyable {
+        public:
+            NonCopyable() = default;
+            NonCopyable(const NonCopyable&) = delete;           // 删除复制构造函数
+            NonCopyable& operator=(const NonCopyable&) = delete; // 删除赋值运算符
+        };
+
 
 默认参数：
     进行函数调用时，调用者可以选择为任何具有默认参数的函数参数提供参数。如果调用者提供参数，则使用函数调用中参数的值。如果调用者未提供参数，则使用默认参数的值。
+
+    基本语法:
+        void greet(const std::string& name = "World") {
+            std::cout << "Hello, " << name << "!" << std::endl;
+        }
+
+        int main() {
+            greet();        // 使用默认参数: "Hello, World!"
+            greet("Alice"); // 使用提供的参数: "Hello, Alice!"
+            return 0;
+        }
 
     规则:
         1:在函数调用中，任何显式提供的参数都必须是最左边的参数（不能跳过具有默认值的参数）
         2:如果为参数指定了默认参数，则所有后续参数（右侧）也必须指定为默认参数。
         3：如果多个参数具有默认参数，则最左边的参数应该是最有可能由用户显式设置的参数。
-       
+
+    示例:
+        // 正确的默认参数设计
+        void createWindow(int width = 800, int height = 600, bool fullscreen = false);
+
+        // 错误的设计 - 编译错误
+        // void badFunction(int a = 10, int b, int c = 30); // b没有默认值
+
+        // 调用示例
+        createWindow();           // 800, 600, false
+        createWindow(1024);       // 1024, 600, false
+        createWindow(1024, 768);  // 1024, 768, false
+        createWindow(1024, 768, true); // 1024, 768, true
+
     默认参数不能重新声明，必须在使用前声明：
         一旦声明，默认参数就不能在同一翻译单元中重新声明。这意味着对于具有前向声明和函数定义的函数，默认参数可以在前向声明或函数定义中声明，但不能同时在两者中声明。
 
         最佳实践是在前向声明中而不是在函数定义中声明默认参数，因为前向声明更有可能被其他文件看到并在使用前包含（特别是在头文件中）。
 
+        // 头文件 (.h)
+        void processData(const std::vector<int>& data, bool normalize = true);
+
+        // 源文件 (.cpp)  
+        void processData(const std::vector<int>& data, bool normalize) {
+            // 实现...
+        }
+
         Best practice：
             *如果函数有前向声明（尤其是头文件中的声明），请将默认参数放在那里。否则，将默认参数放入函数定义中。
 
+    默认参数的高级用法:
+        1. 使用表达式作为默认参数:
+            int getCurrentTime(); // 假设这个函数返回当前时间
 
-模板函数：
+            void logMessage(const std::string& msg, int timestamp = getCurrentTime()) {
+                std::cout << "[" << timestamp << "] " << msg << std::endl;
+            }
+
+        2. 使用之前参数作为默认值:
+            void setPosition(int x, int y = x) { // y的默认值是x的值
+                // 设置位置
+            }
+
+        3. 使用类成员作为默认参数:
+            class Configuration {
+                static const int DEFAULT_TIMEOUT = 5000;
+            public:
+                void connect(int timeout = DEFAULT_TIMEOUT);
+            };
+
+    注意事项:
+        1. 默认参数在编译时求值，不是在运行时
+        2. 默认参数表达式中不能使用局部变量
+        3. 默认参数可能会影响函数重载解析
+        4. 修改默认参数值需要重新编译所有使用该函数的代码
+
+
+模板函数 (Function Templates)：
     *函数模板是一种类似函数的定义，用于生成一个或多个重载函数，每个重载函数具有一组不同的实际类型。这将使我们能够创建可以与许多不同类型一起使用的函数。
 
-        eg:
-            template <typename T>
-            T max(T x, T y)
-            {
-                return (x < y) ? y : x;
-            }
-            注：在这种情况下，typename 和 class 关键字没有区别。您经常会看到人们使用 class 关键字，因为它是较早引入到语言中的。
-                但是，我们更喜欢较新的 typename 关键字，因为它更清楚地表明类型模板参数可以替换为任何类型（例如基本类型），而不仅仅是类类型
+    基本语法和概念:
+        template <typename T>
+        T max(T x, T y)
+        {
+            return (x < y) ? y : x;
+        }
+        注：在这种情况下，typename 和 class 关键字没有区别。您经常会看到人们使用 class 关键字，因为它是较早引入到语言中的。
+            但是，我们更喜欢较新的 typename 关键字，因为它更清楚地表明类型模板参数可以替换为任何类型（例如基本类型），而不仅仅是类类型
 
-    *函数模板实际上并不是函数——它们的代码不会直接编译或执行。相反，函数模板只有一项工作：生成函数（被编译和执行）
-    
-    *实例化函数的过程很简单：编译器本质上克隆了主模板，并将模板类型 (T) 替换为我们指定的实际类型 (int)
-
-    *只要实例化函数模板在语法上有意义，编译器就会成功编译它。然而，编译器没有任何方法来检查这样的函数在语义上是否确实有意义。
+    模板的工作原理:
+        *函数模板实际上并不是函数——它们的代码不会直接编译或执行。相反，函数模板只有一项工作：生成函数（被编译和执行）
         
-        eg:
+        *实例化函数模板的过程很简单：编译器本质上克隆了主模板，并将模板类型 (T) 替换为我们指定的实际类型 (int)
+
+        *只要实例化函数模板在语法上有意义，编译器就会成功编译它。然而，编译器没有任何方法来检查这样的函数在语义上是否确实有意义。
+            
+        例如：
             #include <iostream>
 
             template <typename T>
@@ -443,14 +763,16 @@ delete函数：
             int main()
             {
                 std::cout << addOne("Hello, world!") << '\n';
-
                 return 0;
-            }            //注：在此示例中，我们对 C 样式字符串文字调用 addOne()。这在语义上实际上意味着什么？谁知道！也许令人惊讶的是，因为 C++ 在语法上允许将整数值添加到字符串文字中
+            }
+
+        注：在此示例中，我们对 C 样式字符串文字调用 addOne()。这在语义上实际上意味着什么？谁知道！也许令人惊讶的是，因为 C++ 在语法上允许将整数值添加到字符串文字中
 
         note:
             只要语法上有效，编译器就会实例化并编译语义上没有意义的函数模板。您有责任确保使用有意义的参数调用此类函数模板。
 
-    *我们可以告诉编译器不允许使用某些参数实例化函数模板
+    防止不合适的实例化:
+        *我们可以告诉编译器不允许使用某些参数实例化函数模板
         eg:
             #include <iostream>
             #include <string>
@@ -469,16 +791,28 @@ delete函数：
             int main()
             {
                 std::cout << addOne("Hello, world!") << '\n'; // compile error
-
                 return 0;
-            }       
+            }
 
-    *static local variables:
+    static local variables:
         当在函数模板中使用静态局部变量时，从该模板实例化的每个函数都将具有静态局部变量的单独版本
 
+        template <typename T>
+        void printID() {
+            static int id = 0; // 每个T类型都有自己的id副本
+            std::cout << "ID for " << typeid(T).name() << ": " << ++id << std::endl;
+        }
 
-    *在多个文件中使用函数模板
-        eg: 
+        int main() {
+            printID<int>();    // ID for int: 1
+            printID<int>();    // ID for int: 2
+            printID<double>(); // ID for double: 1
+            printID<double>(); // ID for double: 2
+            return 0;
+        }
+
+    在多个文件中使用函数模板:
+        问题示例: 
         //main.cpp 
             #include <iostream>
             template <typename T>
@@ -488,7 +822,6 @@ delete函数：
             {
                 std::cout << addOne(1) << '\n';
                 std::cout << addOne(2.3) << '\n';
-
                 return 0;
             }
         //add.cpp
@@ -502,16 +835,10 @@ delete函数：
             但是因为 addOne 是一个模板，所以这个程序不起作用，我们得到一个链接器错误：
 
         原因：
-            在 main.cpp 中，我们调用 addOne<int> 和 addOne<double>。但是，由于编译器看不到函数模板 addOne 的定义，因此无法在 main.cpp 中实例化这些函数。
+            在 main.cpp 中，我们调用 addOne<int> 和 addOne<double>。但是，由于编译器看不到函数模板 addOne 的定义，因此无法在 main.cpp中实例化这些函数。
                 不过，它确实看到了 addOne 的前向声明，并且会假设这些函数存在于其他地方，并将在稍后链接。
             当编译器去编译add.cpp时，它会看到函数模板addOne的定义。但是，add.cpp 中没有使用此模板，因此编译器不会实例化任何内容。
                 最终结果是链接器无法将对 main.cpp 中的 addOne<int> 和 addOne<double> 的调用连接到实际函数，因为这些函数从未实例化。
-
-        As an aside:
-            如果 add.cpp 已实例化这些函数，则该程序将可以正常编译和链接。但这样的解决方案很脆弱，
-            应该避免：
-                如果后来更改了 add.cpp 中的代码，使这些函数不再实例化，则程序将再次无法链接
-                或者，如果 main.cpp 调用了未在 add.cpp 中实例化的不同版本的 addOne（例如 addOne<float>），我们会遇到同样的问题。
 
         解决方案：
             解决此问题的最传统方法是将所有模板代码放入头文件 (.h)，而不是源文件 (.cpp)：
@@ -526,24 +853,22 @@ delete函数：
         Best practice:
             多个文件中需要的模板应在头文件中定义，然后在需要的地方#included。这允许编译器查看完整的模板定义并在需要时实例化模板
 
-     *具有多个模板类型参数的函数模板   
-        eg:
-            //由于 T 和 U 是独立的模板参数，因此它们彼此独立地解析其类型。这意味着 T 和 U 可以解析为不同类型，也可以解析为相同类型
-            #include <iostream>
-            template <typename T, typename U> // We're using two template type parameters named T and U
-            T max(T x, U y) // x can resolve to type T, and y can resolve to type U
-            {
-                return (x < y) ? y : x; // uh oh, we have a narrowing conversion problem here
-            }
+     具有多个模板类型参数的函数模板:
+        template <typename T, typename U> 
+        T max(T x, U y) 
+        {
+            return (x < y) ? y : x; // uh oh, we have a narrowing conversion problem here
+        }
 
-            int main()
-            {
-                std::cout << max(2, 3.5) << '\n'; // resolves to max<int, double>
+        int main()
+        {
+            std::cout << max(2, 3.5) << '\n'; // resolves to max<int, double>
+            return 0;
+        }
 
-                return 0;
-            }
+        注：由于 T 和 U 是独立的模板参数，因此它们彼此独立地解析其类型。这意味着 T 和 U 可以解析为不同类型，也可以解析为相同类型
 
-    *auto(C++20):
+    auto关键字 (C++20):
         C++20 引入了 auto 关键字的新用法:
             当普通函数中使用 auto 关键字作为参数类型时，编译器会自动将函数转换为函数模板，每个 auto 参数成为独立的模板类型参数,
                 这种创建函数模板的方法称为缩写函数模板
@@ -557,7 +882,7 @@ delete函数：
             *Best practice:
                 请随意使用带有单个自动参数的缩写函数模板，或者每个自动参数应该是独立类型（并且您的语言标准设置为 C++20 或更高版本）。 
 
-    *overloaded:
+    函数模板重载:
         就像函数可能被重载一样，函数模板也可能被重载。此类重载可以具有不同数量的模板类型和/或不同数量或类型的函数参数
             eg:
                 #include <iostream>
@@ -590,95 +915,500 @@ delete函数：
                     std::cout << add(1.2, 3.4) << '\n'; // instantiates and calls add<double>()
                     std::cout << add(5.6, 7) << '\n';   // instantiates and calls add<double, int>()
                     std::cout << add(8, 9, 10) << '\n'; // instantiates and calls add<int, int, int>()
-
                     return 0;
-                }            
+                }
+
+    模板特化:
+        有时我们希望为特定类型提供模板的自定义实现：
+
+        // 通用模板
+        template <typename T>
+        void print(T value) {
+            std::cout << "General: " << value << std::endl;
+        }
+
+        // 为std::string特化
+        template <>
+        void print<std::string>(std::string value) {
+            std::cout << "String: \"" << value << "\"" << std::endl;
+        }
+
+        // 简化写法
+        template <>
+        void print(const char* value) {
+            std::cout << "C-String: \"" << value << "\"" << std::endl;
+        }
+
+    模板最佳实践:
+        1. 保持模板简单和专注
+        2. 使用有意义的模板参数名
+        3. 提供清晰的文档说明模板的要求
+        4. 考虑使用概念 (C++20) 来约束模板参数
+        5. 避免过度模板化
+        6. 在头文件中定义模板
+        7. 谨慎使用模板特化
 
 
-非类型模板参数:
+非类型模板参数 (Non-type Template Parameters):
     非类型模板参数是具有固定类型的模板参数，用作作为模板参数传入的 constexpr 值的占位符,
-     就像 T 通常用作第一个类型模板参数的名称一样，N 通常用作 int 非类型模板参数的名称
+     就像 T 通常用作第一个类型模板参数的名称一样，N 通常用作 int 非类型模板参数的名称  
   
-    非类型模板参数可以是以下任何类型：
-        .An integral type
-        .An enumeration type
-        .std::nullptr_t
-        .A floating point type (since C++20)
-        .A pointer or reference to an object
-        .A pointer or reference to a function
-        .A pointer or reference to a member function
-        .A literal class type (since C++20)
+    支持的类型:
+        非类型模板参数可以是以下任何类型：
+            .An integral type (整数类型)
+            .An enumeration type (枚举类型)
+            .std::nullptr_t
+            .A floating point type (浮点类型, since C++20)
+            .A pointer or reference to an object (对象的指针或引用)
+            .A pointer or reference to a function (函数的指针或引用)
+            .A pointer or reference to a member function (成员函数的指针或引用)
+            .A literal class type (字面类型, since C++20)
 
-        eg:
-            #include <iostream>
+    基本示例:
+        #include <iostream>
 
-            template <int N> // declare a non-type template parameter of type int named N
-            void print()
-            {
-                std::cout << N << '\n'; // use value of N here
+        template <int N> // declare a non-type template parameter of type int named N
+        void print()
+        {
+            std::cout << N << '\n'; // use value of N here
+        }
+
+        int main()
+        {
+            print<5>(); // 5 is our non-type template argument
+            return 0;
+        }
+
+    实际应用示例:
+        1. 固定大小的数组:
+            template <typename T, size_t SIZE>
+            class FixedArray {
+            private:
+                T data[SIZE];
+            public:
+                T& operator[](size_t index) { return data[index]; }
+                const T& operator[](size_t index) const { return data[index]; }
+                size_t size() const { return SIZE; }
+            };
+
+            FixedArray<int, 10> myArray; // 10个int的数组
+
+        2. 编译时计算:
+            template <int N>
+            constexpr int factorial() {
+                if constexpr (N <= 1) {
+                    return 1;
+                } else {
+                    return N * factorial<N-1>();
+                }
             }
 
-            int main()
-            {
-                print<5>(); // 5 is our non-type template argument
+            constexpr int result = factorial<5>(); // 在编译时计算5!
 
-                return 0;
+        3. 位操作:
+            template <unsigned int BITS>
+            class BitField {
+                static_assert(BITS <= 64, "Too many bits");
+                uint64_t value;
+            public:
+                BitField(uint64_t val = 0) : value(val & ((1ULL << BITS) - 1)) {}
+                // ...其他操作
+            };
+
+    Best practice:
+        使用 N 作为 int 非类型模板参数的名称
+
+    Key insight:
+        非类型模板参数主要在我们需要将 constexpr 值传递给函数（或类类型）时使用，以便它们可以在需要常量表达式的上下文中使用
+            类类型 std::bitset 使用非类型模板参数来定义要存储的位数，因为位数必须是 constexpr 值
+
+    C++20 浮点非类型参数:
+        #include <cmath> // for std::sqrt
+        #include <iostream>
+
+        template <double D> // requires C++20 for floating point non-type parameters
+        double getSqrt()
+        {
+            static_assert(D >= 0.0, "getSqrt(): D must be non-negative");
+
+            if constexpr (D >= 0) // ignore the constexpr here for this example
+                return std::sqrt(D); // strangely, std::sqrt isn't a constexpr function (until C++26)
+
+            return 0.0;
+        }
+
+        int main()
+        {
+            std::cout << getSqrt<5.0>() << '\n';
+            // std::cout << getSqrt<-5.0>() << '\n'; // 编译错误
+            return 0;
+        }
+
+    非类型模板参数的隐式转换:
+        某些非类型模板参数可以隐式转换，以匹配不同类型的非类型模板参数
+
+        template <int N>
+        void func() { std::cout << N << std::endl; }
+
+        int main() {
+            func<5>();     // 直接匹配
+            func<5L>();    // long转换为int
+            func<'A'>();   // char转换为int (ASCII值65)
+            return 0;
+        }
+
+    使用 auto C++17 对非类型模板参数进行类型推导:
+        从 C++17 开始，非类型模板参数可以使用 auto 让编译器从模板实参推导出非类型模板参数:
+            eg：    
+                #include <iostream>
+
+                template <auto N> // deduce non-type template parameter from template argument
+                void print()
+                {
+                    std::cout << N << '\n';
+                }
+
+                int main()
+                {
+                    print<5>();   // N deduced as int `5`
+                    print<'c'>(); // N deduced as char `c`
+                    print<3.14>(); // C++20: N deduced as double `3.14`
+                    return 0;
+                }
+
+    C++20 类类型非类型参数:
+        C++20 允许使用字面类型作为非类型模板参数：
+
+        struct Point {
+            int x, y;
+            constexpr Point(int x, int y) : x(x), y(y) {}
+        };
+
+        template <Point P>
+        void printPoint() {
+            std::cout << "Point(" << P.x << ", " << P.y << ")" << std::endl;
+        }
+
+        int main() {
+            printPoint<Point{3, 4}>();
+            return 0;
+        }
+
+    应用场景总结:
+        1. 编译时常量配置
+        2. 固定大小的数据结构
+        3. 编译时计算和优化
+        4. 类型安全的数值配置
+        5. 元编程和模板特化
+
+
+现代C++函数特性 (C++11及以后):
+
+    尾随返回类型 (Trailing Return Type):
+        使用 auto 和 -> 语法指定返回类型，特别适用于复杂的模板函数。
+
+        // 传统语法
+        template<typename T, typename U>
+        decltype(t + u) add(T t, U u); // 错误：t和u还未声明
+
+        // 尾随返回类型
+        template<typename T, typename U>
+        auto add(T t, U u) -> decltype(t + u) {
+            return t + u;
+        }
+
+        // C++14 简化（自动推导）
+        template<typename T, typename U>
+        auto add(T t, U u) {
+            return t + u; // 编译器自动推导返回类型
+        }
+
+    constexpr和consteval函数的深入:
+        constexpr: 可以在编译时或运行时执行
+        consteval (C++20): 必须在编译时执行
+
+        constexpr int square(int x) {
+            return x * x;
+        }
+
+        consteval int cube(int x) {  // C++20
+            return x * x * x;
+        }
+
+        int main() {
+            constexpr int a = square(5);    // 编译时计算
+            int b = square(5);              // 可能运行时计算
+            constexpr int c = cube(3);      // 必须编译时计算
+            // int d = cube(getValue());    // 错误：cube必须在编译时执行
+            return 0;
+        }
+
+    [[nodiscard]] 属性 (C++17):
+        标记函数返回值不应被忽略。
+
+        [[nodiscard]] int calculate() {
+            return 42;
+        }
+
+        [[nodiscard("Memory leak possible")]] void* allocate(size_t size) {
+            return malloc(size);
+        }
+
+        int main() {
+            calculate();        // 警告：返回值被忽略
+            allocate(100);      // 警告：Memory leak possible
+            return 0;
+        }
+
+    概念 (Concepts) - C++20:
+        为模板参数提供命名的约束。
+
+        #include <concepts>
+
+        // 定义概念
+        template<typename T>
+        concept Numeric = std::integral<T> || std::floating_point<T>;
+
+        template<typename T>
+        concept Addable = requires(T a, T b) {
+            a + b;
+        };
+
+        // 使用概念约束模板
+        template<Numeric T>
+        T multiply(T a, T b) {
+            return a * b;
+        }
+
+        // 更复杂的约束
+        template<typename T>
+        requires Addable<T> && std::copyable<T>
+        T processValue(T value) {
+            return value + value;
+        }
+
+    协程 (Coroutines) - C++20:
+        支持可暂停和恢复的函数。
+
+        #include <coroutine>
+        #include <iostream>
+
+        struct Generator {
+            struct promise_type {
+                int current_value;
+                
+                Generator get_return_object() {
+                    return Generator{std::coroutine_handle<promise_type>::from_promise(*this)};
+                }
+                
+                std::suspend_always initial_suspend() { return {}; }
+                std::suspend_always final_suspend() noexcept { return {}; }
+                void unhandled_exception() {}
+                
+                std::suspend_always yield_value(int value) {
+                    current_value = value;
+                    return {};
+                }
+                
+                void return_void() {}
+            };
+            
+            std::coroutine_handle<promise_type> handle;
+            
+            Generator(std::coroutine_handle<promise_type> h) : handle(h) {}
+            ~Generator() { if (handle) handle.destroy(); }
+            
+            bool next() {
+                handle.resume();
+                return !handle.done();
             }
+            
+            int value() { return handle.promise().current_value; }
+        };
 
-        Best practice:
-            使用 N 作为 int 非类型模板参数的名称
+        Generator fibonacci() {
+            int a = 0, b = 1;
+            while (true) {
+                co_yield a;
+                auto temp = a;
+                a = b;
+                b = temp + b;
+            }
+        }
 
-        Key insight:
-            非类型模板参数主要在我们需要将 constexpr 值传递给函数（或类类型）时使用，以便它们可以在需要常量表达式的上下文中使用
-                类类型 std::bitset 使用非类型模板参数来定义要存储的位数，因为位数必须是 constexpr 值
+    模块 (Modules) - C++20:
+        新的代码组织方式，替代传统的头文件包含系统。
 
-                eg:
-                    #include <cmath> // for std::sqrt
-                    #include <iostream>
+        // math.ixx (模块接口文件)
+        export module math;
 
-                    template <double D> // requires C++20 for floating point non-type parameters
-                    double getSqrt()
-                    {
-                        static_assert(D >= 0.0, "getSqrt(): D must be non-negative");
+        export int add(int a, int b) {
+            return a + b;
+        }
 
-                        if constexpr (D >= 0) // ignore the constexpr here for this example
-                            return std::sqrt(D); // strangely, std::sqrt isn't a constexpr function (until C++26)
+        export template<typename T>
+        T multiply(T a, T b) {
+            return a * b;
+        }
 
-                        return 0.0;
-                    }
+        // main.cpp
+        import math;
 
-                    int main()
-                    {
-                        std::cout << getSqrt<5.0>() << '\n';
-                        std::cout << getSqrt<-5.0>() << '\n';
+        int main() {
+            int result = add(5, 3);
+            double product = multiply(2.5, 4.0);
+            return 0;
+        }
 
-                        return 0;
-                    }
+    三路比较运算符 (Spaceship Operator) - C++20:
+        简化比较运算符的实现。
 
-        非类型模板参数的隐式转换:
-            某些非类型模板参数可以隐式转换，以匹配不同类型的非类型模板参数
+        #include <compare>
 
-        使用 auto C++17 对非类型模板参数进行类型推导:
-            从 C++17 开始，非类型模板参数可以使用 auto 让编译器从模板实参推导出非类型模板参数:
-                eg：    
-                    #include <iostream>
+        class Point {
+            int x, y;
+        public:
+            Point(int x, int y) : x(x), y(y) {}
+            
+            // 自动生成所有比较运算符
+            auto operator<=>(const Point& other) const = default;
+        };
 
-                    template <auto N> // deduce non-type template parameter from template argument
-                    void print()
-                    {
-                        std::cout << N << '\n';
-                    }
+        int main() {
+            Point p1{1, 2};
+            Point p2{1, 3};
+            
+            auto result = p1 <=> p2;  // 三路比较
+            bool less = (p1 < p2);    // 自动可用
+            bool equal = (p1 == p2);  // 自动可用
+            return 0;
+        }
 
-                    int main()
-                    {
-                        print<5>();   // N deduced as int `5`
-                        print<'c'>(); // N deduced as char `c`
+    完美转发 (Perfect Forwarding):
+        保持参数的值类别（左值或右值）进行转发。
 
-                        return 0;
-                    }
+        template<typename Func, typename... Args>
+        auto call_function(Func&& func, Args&&... args) 
+            -> decltype(func(std::forward<Args>(args)...)) {
+            
+            return func(std::forward<Args>(args)...);
+        }
 
-        
+        void process_lvalue(int& x) { /* ... */ }
+        void process_rvalue(int&& x) { /* ... */ }
+
+        int main() {
+            int value = 42;
+            
+            call_function(process_lvalue, value);      // 转发左值
+            call_function(process_rvalue, 42);         // 转发右值
+            call_function(process_rvalue, std::move(value)); // 转发右值
+            
+            return 0;
+        }
+
+函数式编程支持:
+    C++提供了一些函数式编程的特性，虽然不如纯函数式语言强大，但在某些场景下非常有用。
+
+    高阶函数:
+        接受函数作为参数或返回函数的函数。
+
+        #include <functional>
+        #include <vector>
+        #include <algorithm>
+
+        // 接受函数作为参数
+        template<typename Func>
+        auto apply_twice(Func f, int x) {
+            return f(f(x));
+        }
+
+        // 返回函数
+        auto make_multiplier(int factor) {
+            return [factor](int x) { return x * factor; };
+        }
+
+        int main() {
+            auto double_func = [](int x) { return x * 2; };
+            int result = apply_twice(double_func, 5); // 20
+
+            auto triple = make_multiplier(3);
+            int result2 = triple(4); // 12
+            
+            return 0;
+        }
+
+    函数组合:
+        #include <functional>
+
+        template<typename F, typename G>
+        auto compose(F f, G g) {
+            return [f, g](auto x) { return f(g(x)); };
+        }
+
+        int main() {
+            auto add_one = [](int x) { return x + 1; };
+            auto multiply_two = [](int x) { return x * 2; };
+            
+            auto composed = compose(multiply_two, add_one);
+            int result = composed(5); // (5 + 1) * 2 = 12
+            
+            return 0;
+        }
+
+    柯里化 (Currying):
+        将多参数函数转换为单参数函数序列。
+
+        template<typename Func>
+        auto curry(Func func) {
+            return [func](auto first) {
+                return [func, first](auto... rest) {
+                    return func(first, rest...);
+                };
+            };
+        }
+
+        int add_three(int a, int b, int c) {
+            return a + b + c;
+        }
+
+        int main() {
+            auto curried_add = curry(add_three);
+            auto add_5 = curried_add(5);
+            int result = add_5(3, 2); // 5 + 3 + 2 = 10
+            
+            return 0;
+        }
+
+
+总结和最佳实践:
+    函数设计原则:
+        1. 单一职责: 每个函数只做一件事
+        2. 纯函数优先: 无副作用，相同输入产生相同输出
+        3. 接口简洁: 参数列表不宜过长
+        4. 错误处理: 优先使用异常而不是错误码
+        5. 性能考虑: 合理使用引用、移动语义等
+
+    现代C++函数最佳实践:
+        1. 使用auto进行类型推导
+        2. 优先使用范围for循环和STL算法
+        3. 使用lambda表达式处理简短逻辑
+        4. 使用constexpr提高编译时性能
+        5. 使用概念约束模板参数 (C++20)
+        6. 合理使用[[nodiscard]]等属性
+        7. 考虑使用协程处理异步操作 (C++20)
+
+    性能优化技巧:
+        1. 内联小函数
+        2. 避免不必要的拷贝
+        3. 使用移动语义
+        4. 合理使用模板
+        5. 考虑编译时计算
+        6. 注意缓存友好性
+        7. 避免过度抽象
 
 
 
-        
+
+
+
